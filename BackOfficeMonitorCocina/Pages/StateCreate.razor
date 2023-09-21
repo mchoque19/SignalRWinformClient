@@ -1,0 +1,72 @@
+﻿@page "/stateNew"
+@page "/stateNew/{Id:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _StateRespository
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+
+<h3>StateCreate</h3>
+
+<EditForm Model="state">
+    <div class="container-fluid">
+        <div class="formbtn-group row mb-1">
+            <label class="col-sm-3">Nombre</label>
+            <div class="col-sm-9">
+                <InputText class="form-control" @bind-Value="state.Name"></InputText>
+            </div>
+        </div>
+        <div class="formbtn-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="SaveState">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    DAL.DAO.State state = new DAL.DAO.State();
+
+    private async Task SaveState()
+    {
+        if (Id != 0)
+        {
+            await base.OnInitializedAsync();
+            var response = _StateRespository.Update(state);
+            if (response)
+            {
+                Console.WriteLine("exito");
+                NavigationManager.NavigateTo("state");
+            }
+            else
+            {
+                Console.WriteLine("bad");
+            }
+
+        }
+        else
+        {
+            await base.OnInitializedAsync();
+            var response = _StateRespository.Insert(state);
+            if (response)
+            {
+                Console.WriteLine("exito");
+                NavigationManager.NavigateTo("state");
+            }
+            else
+            {
+                Console.WriteLine("bad");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            state = await _StateRespository.GetByIdAsync(Id);
+        }
+    }
+
+
+}

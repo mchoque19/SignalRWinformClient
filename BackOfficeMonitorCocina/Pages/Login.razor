@@ -1,0 +1,64 @@
+﻿@page "/"
+@using BackOfficeMonitorCocina.Shared;
+@layout LoginLayout
+@using BackOfficeMonitorCocina.Extensiones
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticationProvide
+@inject DAL.Services.UserService userService
+@inject NavigationManager NavigationManager
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@inject ISnackbar Snackbar
+
+<EditForm Model="@user" OnValidSubmit="LoginSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
+                <MudCardContent>
+                    <MudTextField Label="Usuario"
+                    @bind-Value="user.Username" For="@(() => user.Username)" />
+                    <MudTextField Label="Contraseña" Class="mt-3"
+                    @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
+                </MudCardContent>
+                <div class="d-flex align-center justify-center">               
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mb-3">Iniciar sesión</MudButton>
+                </div>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    DAL.DAO.User user = new DAL.DAO.User();
+    DAL.DTO.SessionDto sesionUser = new DAL.DTO.SessionDto();
+
+    private async Task LoginSubmit()
+    {
+        try
+        {
+            sesionUser = await userService.Login(user);
+        }
+        catch
+        {
+            Snackbar.Add("Usuario o contrasenya incorrectos", Severity.Error);
+
+        }
+
+        if (sesionUser != null)
+        {
+            var autenticacionExt = (AutenticacionExtension)autenticationProvide;
+            await autenticacionExt.ActualizarEstadoAutenticacion(sesionUser);
+
+            NavigationManager.NavigateTo("/index");
+        }
+        else
+        {
+            Snackbar.Add("Usuario o contrasenya incorrectos", Severity.Error);
+        }
+    }
+}
+
+ 
+ 

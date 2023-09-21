@@ -1,0 +1,110 @@
+﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _DepartmentService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _FamilyService
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+@* mudblazor *@
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
+@inject NavigationManager NavigationManager
+
+@page "/department"
+@* <h3>Department</h3>
+<div class="row">
+    <div class="col-12 text-aling-right">
+        <a href="departmentNew">Nuevo</a>
+    </div>
+</div> *@
+@if (departmentList.Any())
+{
+    <MudTable Items="@departmentList" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DAL.DAO.Department,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+        <ToolBarContent>
+            <MudText Typo="Typo.h4">Departamento</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <hr class="mud-divider mud-divider-flexitem mud-divider-vertical mud-divider-middle mx-4 my-4">
+            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(OpenDialog)" Variant="Variant.Filled" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Familia</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Name">@context.Family.Name</MudTd>
+                @* <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => EditDepartment(@context))" /></MudTd> *@
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable> 
+}
+@code {
+    private IEnumerable<DAL.DAO.Department> departmentList = Array.Empty<DAL.DAO.Department>();
+    public IEnumerable<DAL.DAO.Family> familyList = Array.Empty<DAL.DAO.Family>();
+
+    //Filtro de la tabla
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    private string searchString1 = "";
+    private DAL.DAO.Department selectedItem1 = null;
+    private HashSet<DAL.DAO.Department> selectedItems = new HashSet<DAL.DAO.Department>();
+
+    private IEnumerable<DAL.DAO.Department> Elements = new List<DAL.DAO.Department>();
+
+
+    private bool FilterFunc1(DAL.DAO.Department element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.Department element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Family.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    //fin
+    //Crear
+ 
+    private async void AddDepartment()
+    {
+        Console.WriteLine("Crear new");
+        var dialogParameters = new DialogParameters();
+        dialogParameters.Add("familyList", familyList);
+
+        var dialog = DialogService.Show<Pages.DialogDepartament>("Nuevo Departamento", dialogParameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            departmentList = await _DepartmentService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task OpenDialog()
+    {
+        var parameters = new DialogParameters();      
+        parameters.Add("familyList", familyList);
+        var dialogRef = DialogService.Show<Pages.DialogDepartament>("Nuevo Departamento", parameters);
+        var result = await dialogRef.Result;
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        departmentList = await _DepartmentService.GetAll();
+        familyList = await _FamilyService.GetAll();
+    }
+}

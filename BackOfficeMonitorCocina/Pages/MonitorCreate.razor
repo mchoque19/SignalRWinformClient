@@ -1,0 +1,72 @@
+﻿@page "/monitorNew"
+@page "/monitorNew/{Id:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _MonitorRespository
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+
+<h3>MonitorCreate</h3>
+
+<EditForm Model="monitor">
+    <div class="container-fluid">
+        <div class="formbtn-group row mb-1">
+            <label class="col-sm-3">Nombre</label>
+            <div class="col-sm-9">
+                <InputText class="form-control" @bind-Value="monitor.Name"></InputText>
+            </div>
+        </div>
+        <div class="formbtn-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="SaveMonitor">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
+
+    private async Task SaveMonitor()
+    {
+        if (Id != 0)
+        {
+            await base.OnInitializedAsync();
+            var response = _MonitorRespository.Update(monitor);
+            if (response)
+            {
+                Console.WriteLine("exito");
+                NavigationManager.NavigateTo("monitor");
+            }
+            else
+            {
+                Console.WriteLine("bad");
+            }
+
+        }
+        else
+        {
+            await base.OnInitializedAsync();
+            var response = _MonitorRespository.Insert(monitor);
+            if (response)
+            {
+                Console.WriteLine("exito");
+                NavigationManager.NavigateTo("monitor");
+            }
+            else
+            {
+                Console.WriteLine("bad");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            monitor = await _MonitorRespository.GetByIdAsync(Id);
+        }
+    }
+
+
+}

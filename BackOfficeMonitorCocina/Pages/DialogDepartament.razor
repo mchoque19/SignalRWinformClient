@@ -1,0 +1,47 @@
+﻿@using MudBlazor;
+ 
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _FamilyService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _DepartmentService
+
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+ 
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="@department.Name" Label="Nombre"></MudTextField>
+        <MudSelect T="int" Label="Familia" AnchorOrigin="Origin.BottomCenter" @bind-Value="IdFamily">
+            @foreach (var item in familyList)
+            {
+                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter] public DAL.DAO.Department department { get; set; } = new DAL.DAO.Department();
+    [Parameter]
+    public IEnumerable<DAL.DAO.Family> familyList { get; set; } = Array.Empty<DAL.DAO.Family>();
+    [Parameter] 
+    public int IdFamily { get; set; }
+
+    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    {
+        Console.WriteLine("##############");
+        Console.WriteLine(department.Id);
+        Console.WriteLine(IdFamily);
+
+    }
+
+}

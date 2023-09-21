@@ -1,0 +1,72 @@
+﻿@using MudBlazor;
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _GenericRespository
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>       
+        <MudTextField @bind-Value="@server.Name" Label="Nombre" />
+   </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+ 
+   
+@code {
+    private string input = string.Empty;
+    private string Id = string.Empty;
+
+    [Parameter] public DAL.DAO.Family  server { get; set; } = new DAL.DAO.Family();
+
+
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = default!;
+
+    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    {
+        if (server.Id != 0)
+        {
+            await base.OnInitializedAsync();
+            Console.WriteLine(server.Id);
+            Console.WriteLine(server.Name);
+            var response = _GenericRespository.Update(server);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+        else 
+        {
+            await base.OnInitializedAsync();
+            var response = _GenericRespository.Insert(server);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+       
+    }
+}

@@ -1,0 +1,107 @@
+﻿@page "/family"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> familyService
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+@using System.Net.Http.Json
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
+@inject NavigationManager NavigationManager
+ 
+@if (Data.Any()) 
+    {
+    <MudTable Items="@Data" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DAL.DAO.Family,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+        <ToolBarContent>
+            <MudText Typo="Typo.h4">Familia</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            <hr class="mud-divider mud-divider-flexitem mud-divider-vertical mud-divider-middle mx-4 my-4">
+            <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(AddFamilyDialog)" Variant="Variant.Filled" />
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh></MudTh>
+           </HeaderContent>
+        <RowTemplate>    
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => OpenDialog(@context))"   /></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent> 
+    </MudTable>
+
+   
+   
+    }
+@code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    private string searchString1 = "";
+    private DAL.DAO.Family  selectedItem1 = null;
+    private HashSet<DAL.DAO.Family> selectedItems = new HashSet<DAL.DAO.Family>();
+
+    private IEnumerable<DAL.DAO.Family> Elements = new List<DAL.DAO.Family>();
+
+
+    private bool FilterFunc1(DAL.DAO.Family element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.Family element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    // fin prueba
+   
+    private IEnumerable<DAL.DAO.Family> Data = Array.Empty<DAL.DAO.Family>();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Data = await familyService.GetAll();
+    }
+
+    private async void OpenDialog(DAL.DAO.Family family)
+    {
+        Console.WriteLine("###########################");
+        Console.WriteLine(family.Id);
+        Console.WriteLine(family.Id);
+        //prueba
+        var dialogParameters = new DialogParameters();
+        dialogParameters.Add("server", family);
+
+        var dialog = DialogService.Show<Pages.DialogNew>($"Editar {family.Name}", dialogParameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            StateHasChanged();
+        }
+
+    }
+
+    private async void AddFamilyDialog()
+    {           
+        //prueba
+        var dialogParameters = new DialogParameters();
+        var dialog = DialogService.Show<Pages.DialogNew>("Nueva Familia", dialogParameters);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Data = await familyService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+}

@@ -1,0 +1,45 @@
+﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _MonitorRespository
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+
+@page "/monitor"
+<h3>Monitor</h3>
+<div class="row">
+    <div class="col-12 text-aling-right">
+        <a href="monitorNew">Nuevo</a>
+    </div>
+</div>
+@if (Data.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Data)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td> <a href="/monitoArticle/@item.Id">@item.Name</a></td>
+                    <td> <a href="/monitorNew/@item.Id">Editar</a> </td>
+                    @* <td><a href="/eliminar/@item.Id">Eliminar</a></td> *@
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+@code {
+    private IEnumerable<DAL.DAO.Monitor> Data = Array.Empty<DAL.DAO.Monitor>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Data = await _MonitorRespository.GetAll();
+    }
+}

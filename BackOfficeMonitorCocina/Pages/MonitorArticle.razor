@@ -1,0 +1,210 @@
+﻿@page "/monitoArticle/{Id:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _MonitorRepository
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _ArticleRepository
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _stateRepository
+@inject DAL.Services.StateService stateService
+@inject DAL.Services.MonitorService monitorService
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+
+<h3>MonitorArticle</h3>
+<p>@monitor.Name</p>
+
+<EditForm Model="monitor">
+    <div class="formbtn-group row mb-1">
+        <label class="col-sm-3">Articulos</label>
+        <InputSelect class="form-select" @bind-Value="IdArticle">
+            <option>seleccionar</option>
+
+            @foreach (DAL.DAO.Article item in Data)
+            {  
+               <option value="@item.Id">@item.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="formbtn-group row mb-1">
+        <div class="col-sm-12">
+            <button class="btn btn-primary" @onclick="Save">Guardar Articulo</button>
+        </div>
+    </div>
+</EditForm>
+<h3>Estado</h3>
+<EditForm Model="monitor">
+    <div class="formbtn-group row mb-1">
+        <label class="col-sm-3">Estados</label>
+        <InputSelect class="form-select" @bind-Value="idState">
+            <option>seleccionar</option>
+
+            @foreach (DAL.DAO.State item in listStates)
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="formbtn-group row mb-1">
+        <div class="col-sm-12">
+            <button class="btn btn-primary" @onclick="saveState">Guardar Estado</button>
+        </div>
+    </div>
+</EditForm>
+
+ 
+
+ <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Articulo</th>             
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>                  
+            @foreach (var article in monitorArticles)
+            {
+                <tr>
+                    <td>@article.Id</td>
+                    <td>@article.Name</td>
+                    <td>
+                    <button @onclick="() => DeleteArticle(article.Id)">
+                        Eliminar
+                    </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+<h3>Lista Estados</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Estado</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var state in monitorStates)
+        {
+            <tr>
+                <td>@state.Id</td>
+                <td>@state.Name</td>
+                <td>
+                    <button @onclick="() => deleteState(state.Id)">
+                        Eliminar
+                   </button> 
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public int IdArticle { get; set; }
+    DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
+    public List<DAL.DAO.Article> monitorArticles = new List<DAL.DAO.Article>();
+    private IEnumerable<DAL.DAO.Article> Data = Array.Empty<DAL.DAO.Article>();
+    DAL.DAO.Article article = new DAL.DAO.Article();
+
+    // formulario de estado
+    public int idState { get; set; }
+    private IEnumerable<DAL.DAO.State> listStates = Array.Empty<DAL.DAO.State>();
+    public List<DAL.DAO.State> monitorStates = new List<DAL.DAO.State>();
+
+
+    private async Task Save()
+    {
+        await base.OnInitializedAsync();         
+        var response = monitorService.InsertArticleInMonitor(monitor, IdArticle);
+        if (response)
+        {
+            Console.WriteLine("exito");
+            NavigationManager.NavigateTo($"monitoArticle/{Id}", true);
+
+        }
+        else
+        {
+            Console.WriteLine("bad");
+            NavigationManager.NavigateTo("monitorArticle");
+        }
+
+    }
+
+    private async Task DeleteArticle(int IdArticle)
+    {
+        await base.OnInitializedAsync();
+        var response = monitorService.DeleteArticleOfMonitor(monitor, IdArticle);
+        if (response)
+        {
+            Console.WriteLine("exito");
+            NavigationManager.NavigateTo($"monitoArticle/{Id}", true);
+
+        }
+        else
+        {
+            Console.WriteLine("bad");
+            NavigationManager.NavigateTo("monitorArticle");
+        }
+
+
+    }
+
+    private async Task deleteState(int idState)
+    {
+        await base.OnInitializedAsync();
+        var response = stateService.deleteMonitorStatus(monitor, idState);
+        if (response)
+        {
+            Console.WriteLine("exito");
+            NavigationManager.NavigateTo($"monitoArticle/{Id}", true);
+
+        }
+        else
+        {
+            Console.WriteLine("bad");
+            NavigationManager.NavigateTo("monitorArticle");
+        }
+
+
+    }
+    private async Task saveState()
+    {
+        await base.OnInitializedAsync();
+        var response = stateService.addStatInMonitorn(monitor, idState);
+        if (response)
+        {
+            Console.WriteLine("exito");
+            NavigationManager.NavigateTo($"monitoArticle/{Id}", true);
+
+        }
+        else
+        {
+            Console.WriteLine("bad");
+            NavigationManager.NavigateTo("monitorArticle");
+        }        
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Data = await _ArticleRepository.GetAll(); 
+        monitor = await _MonitorRepository.GetByIdAsync(Id);        
+        @foreach (var article in monitor.Articles)
+        {
+          monitorArticles.Add(article);   
+        }
+        @foreach (var state in monitor.States)
+        {
+            monitorStates.Add(state);
+        }
+        //parte de estado
+        listStates = await _stateRepository.GetAll();
+
+    }
+              
+
+    
+}

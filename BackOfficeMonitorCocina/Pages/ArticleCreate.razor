@@ -1,0 +1,107 @@
+﻿@page "/articleNew"
+@page "/articleNew/{Id:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _DepartmentRespository
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _ArtcleRepository
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+
+<h3>ArticleCreate</h3>
+
+<EditForm Model="article">
+    <div class="container-fluid">
+        <div class="formbtn-group row mb-1">
+            <label class="col-sm-3">Nombre</label>
+            <div class="col-sm-9">
+                <InputText class="form-control" @bind-Value="article.Name"></InputText>
+
+             </div>
+        </div>
+        <div class="formbtn-group row mb-1">
+            <label class="col-sm-3">Departamentos</label>
+            <InputSelect class="form-select" @bind-Value="IdDepartment">
+                @foreach (var item in departmentList)
+                {
+                    if (item.Id == IdDepartment)
+                    {
+                        <option value="@item.Id" selected>@item.Name (IdDepartment: @item.Id)</option>
+                    }
+                    else
+                    {    
+                        <option value="@item.Id">@item.Name</option>                        
+                    }                
+                }         
+            </InputSelect>
+        </div>
+        <div class="formbtn-group row mb-1">
+            <div class="col-sm-12"> 
+                <button class="btn btn-primary" @onclick="SaveArticle">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public int IdDepartment { get; set; }
+
+    DAL.DAO.Article article = new DAL.DAO.Article();
+    public DAL.DAO.Department department = new DAL.DAO.Department();
+    private IEnumerable<DAL.DAO.Department> departmentList = Array.Empty<DAL.DAO.Department>();
+
+
+    private async Task SaveArticle()
+    {
+        if (Id != 0)
+        {
+            await base.OnInitializedAsync();
+            department = await _DepartmentRespository.GetByIdAsync(IdDepartment);
+            article.Department = department;
+            var response = _ArtcleRepository.Update(article);
+            if (response)
+            {
+                Console.WriteLine("exito");
+                NavigationManager.NavigateTo("article");
+            }
+            else
+            {
+                Console.WriteLine("bad");
+            }
+
+        }
+        else
+        {
+
+            await base.OnInitializedAsync();
+            department = await _DepartmentRespository.GetByIdAsync(IdDepartment);
+            article.Department = department;
+
+            var response = _ArtcleRepository.Insert(article);
+            if (response)
+            {
+                Console.WriteLine("exito");
+                NavigationManager.NavigateTo("article");
+            }
+            else
+            {
+                Console.WriteLine("bad");
+            }
+            Console.WriteLine(article.Name);
+            Console.WriteLine(IdDepartment);
+
+        }        
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        departmentList = await _DepartmentRespository.GetAll();
+        if (Id != 0)
+        {
+            article = await _ArtcleRepository.GetByIdAsync(Id);
+            IdDepartment = article.Department.Id;
+        }
+    }
+
+}

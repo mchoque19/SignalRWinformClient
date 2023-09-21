@@ -1,0 +1,57 @@
+﻿@page "/register"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.User> _userRespository
+@inject NavigationManager NavigationManager
+
+<h3>Register</h3>
+<EditForm Model="user">
+    <h3>Edit Employee</h3>
+    <hr />
+    <div class="form-group row">
+        <label for="username" class="col-sm-2 col-form-label">
+            Usuario
+        </label>
+        <div class="col-sm-10">
+           
+            <InputText class="form-control" @bind-Value="user.Username"></InputText>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="password" class="col-sm-2 col-form-label">
+            Password
+        </label>
+        <div class="col-sm-10">
+            <InputText class="form-control" @bind-Value="user.Password"></InputText>
+        </div>
+    </div>
+    <div class="formbtn-group row mb-1">
+        <div class="col-sm-12">
+            <button class="btn btn-primary" @onclick="SaveRegister">Guardar</button>
+        </div>
+    </div>
+
+</EditForm>
+@code {
+    DAL.DAO.User user = new DAL.DAO.User();
+    //obtener listado de usuario 
+    //no tendra role
+    //creo que solo sera un usuario para hacer login 
+    //se usara session
+
+    private async Task SaveRegister()
+    {
+        Console.WriteLine("Guardar usuario");
+
+        await base.OnInitializedAsync();           
+        var response = _userRespository.Insert(user);
+        if (response)
+        {
+            Console.WriteLine("exito");
+            NavigationManager.NavigateTo("department");
+        }
+        else
+        {
+            Console.WriteLine("bad");
+        }
+    }
+
+}

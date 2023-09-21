@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Sesion</MudNavLink>
+    <MudNavLink Href="/index" Match="NavLinkMatch.Prefix">Home</MudNavLink>
+    <MudNavLink Href="/family" Match="NavLinkMatch.Prefix">Familia</MudNavLink>
+    <MudNavLink Href="/department" Match="NavLinkMatch.Prefix">Departmento</MudNavLink>
+    <MudNavLink Href="/article" Match="NavLinkMatch.Prefix">Articulo</MudNavLink>
+    <MudNavLink Href="/monitor" Match="NavLinkMatch.Prefix">Monitor</MudNavLink>
+    <MudNavLink Href="/state" Match="NavLinkMatch.Prefix">Estado</MudNavLink>
+    <MudNavLink Href="/register" Match="NavLinkMatch.Prefix">Registrarse</MudNavLink>
+    <MudNavGroup Title="Settings" Expanded="true">
+        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
+</MudNavMenu> 
