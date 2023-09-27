@@ -51,5 +51,14 @@ namespace DAL.Services
             _context.Update(department);
             return Save(); throw new NotImplementedException();
         }
+        //obtener los departamentos con la familia
+        public async Task<IEnumerable<Department>> GetAllDepartmentAndFamily()
+        {
+            return await _context.Department.ToListAsync();
+
+        }
+
+
+
     }
 }

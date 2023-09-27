@@ -9,7 +9,7 @@
 <MudDialog>
     <DialogContent>
         <MudTextField @bind-Value="@department.Name" Label="Nombre"></MudTextField>
-        <MudSelect T="int" Label="Familia" AnchorOrigin="Origin.BottomCenter" @bind-Value="IdFamily">
+        <MudSelect T="int" Label="Familia" AnchorOrigin="Origin.BottomCenter" @bind-Value="idFamily">
             @foreach (var item in familyList)
             {
                 <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
@@ -31,16 +31,67 @@
     [Parameter]
     public IEnumerable<DAL.DAO.Family> familyList { get; set; } = Array.Empty<DAL.DAO.Family>();
     [Parameter] 
-    public int IdFamily { get; set; }
+    public int idFamily { get; set; }
 
-    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    //Familia pasar guardar
+    public DAL.DAO.Family family { get; set; } = new DAL.DAO.Family();
+
+
+
+    //me falta obtener la id de la familia del departamento para la parte de edicion 
+    //se debe de poner if el se al guardar o edidat 
     void Cancel() => MudDialog.Cancel();
 
     private async Task Save()
     {
         Console.WriteLine("##############");
         Console.WriteLine(department.Id);
-        Console.WriteLine(IdFamily);
+        //Console.WriteLine(IdFamily);
+
+        if(department.Id != 0)
+        {
+            //actualizar 
+            await base.OnInitializedAsync();
+            family = await _FamilyService.GetByIdAsync(idFamily);
+            department.Family = family;
+            var response = _DepartmentService.Update(department);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+        else
+        {
+            await base.OnInitializedAsync();
+            //GUARDAR
+            family = await _FamilyService.GetByIdAsync(idFamily);
+            department.Family = family;
+            var response = _DepartmentService.Insert(department);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+ 
+
+     
+
 
     }
 

@@ -8,8 +8,7 @@
 @using BackOfficeMonitorCocina.Pages
 @inject NavigationManager NavigationManager
  
-@if (Data.Any()) 
-    {
+ 
     <MudTable Items="@Data" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DAL.DAO.Family,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
         <ToolBarContent>
             <MudText Typo="Typo.h4">Familia</MudText>
@@ -23,10 +22,14 @@
             <MudTh>Name</MudTh>
             <MudTh></MudTh>
            </HeaderContent>
-        <RowTemplate>    
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => OpenDialog(@context))"   /></MudTd>
+        <RowTemplate>
+            @if (Data.Any())
+            {
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => OpenDialog(@context))" /></MudTd>
+ 
+        }
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -34,8 +37,7 @@
     </MudTable>
 
    
-   
-    }
+  
 @code {
     private bool dense = false;
     private bool hover = true;
