@@ -3,6 +3,7 @@ using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,12 +52,12 @@ namespace DAL.Services
             _context.Update(department);
             return Save(); throw new NotImplementedException();
         }
-        //obtener los departamentos con la familia
-        public async Task<IEnumerable<Department>> GetAllDepartmentAndFamily()
-        {
-            return await _context.Department.ToListAsync();
+        ////obtener los departamentos con la familia
+        //public async Task<IEnumerable<Department>> GetAllDepartmentAndFamily()
+        //{
+        //    return await _context.Department.Include(d => d.Family).ToListAsync();
 
-        }
+        //}
 
 
 

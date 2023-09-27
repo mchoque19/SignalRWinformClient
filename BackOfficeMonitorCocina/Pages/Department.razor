@@ -92,7 +92,6 @@
 
         if (!result.Canceled)
         {
-            //departmentList = await _DepartmentService.GetAll();
             StateHasChanged();
         }
     }
@@ -105,7 +104,7 @@
         var result = await dialogRef.Result;
         if (!result.Canceled)
         {
-            //Data = await familyService.GetAll();
+            departmentList = await _DepartmentService.GetAll();
             StateHasChanged();
         }
     }
