@@ -53,11 +53,15 @@ namespace DAL.Services
             return Save(); throw new NotImplementedException();
         }
         ////obtener los departamentos con la familia
-        //public async Task<IEnumerable<Department>> GetAllDepartmentAndFamily()
-        //{
-        //    return await _context.Department.Include(d => d.Family).ToListAsync();
-
-        //}
+        public async Task<Department> GetAllArticlesByDepartment(int id)
+        {
+            return await _context.Department.Include(d => d.Articles).FirstAsync(d => d.Id == id);
+            //return await _context.Article.Where(b => b.Id == id).ToListAsync();
+            //_context.Department
+            //       .Where(b => b.Id == id)
+            //       .Include(b => b.Articles)
+            //       .ToListAsync();                                 
+        }
 
 
 

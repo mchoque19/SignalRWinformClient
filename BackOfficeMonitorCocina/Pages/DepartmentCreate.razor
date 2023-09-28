@@ -2,7 +2,6 @@
 @page "/departmentNew/{Id:int}"
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _DepartmentRespository
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _FamilyRespository
-
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
@@ -43,6 +42,9 @@
 </EditForm>
 
 @code {
+    /// <summary>
+    ///BORRAR AL TERMINAR 
+    /// </summary>
     [Parameter]
     public int Id { get; set; }
     public int IdFamily { get; set; }

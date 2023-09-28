@@ -1,0 +1,124 @@
+﻿@page "/department-article"
+@page "/department-article/{idDepartment:int}"
+ 
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _departmentService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _familyService
+ 
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
+@inject NavigationManager NavigationManager
+
+<MudTable Items="@ArticlesByDepartment.Articles" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Article,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">@ArticlesByDepartment.Name</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(addArticle)" Variant="Variant.Filled" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Nombre</MudTh>
+        <MudTh></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.Id</MudTd>
+        <MudTd DataLabel="Sign">@context.Name</MudTd>
+        <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => updateArticle(@context))" /></MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+<div class="d-flex flex-wrap mt-4">
+    <MudSpacer />
+    <div style="min-width:200px;">
+        <MudText Inline="true" Class="align-self-center">Selected1: @selectedItem1?.Name</MudText>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int idDepartment { get; set; }
+    //articulos del departamento a pintar en tabla
+    private DAL.DAO.Department ArticlesByDepartment = new DAL.DAO.Department();
+    //lista de todas las familias
+
+    [Parameter]
+    public IEnumerable<DAL.DAO.Department> departmentList { get; set; } = Array.Empty<DAL.DAO.Department>();
+
+    //obtener lista de articulos
+    //agregar y editar articulos sin tener que agregar departamento 
+    //pasar por parametros true false apra activar desactivar select
+    // servicio con articulo include en departmente , de esta manera no se tiene que hacer add
+
+    // table
+    
+    private string searchString1 = "";
+    private DAL.DAO.Article selectedItem1 = null;
+    private HashSet<DAL.DAO.Article> selectedItems = new HashSet<DAL.DAO.Article>();
+
+    private IEnumerable<DAL.DAO.Article> Elements = new List<DAL.DAO.Article>();     
+
+    private bool FilterFunc1(DAL.DAO.Article element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.Article element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        // if (element.Sign.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        //     return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    //fin table
+
+    //crear articulo en departmaernto
+
+
+    private async Task addArticle()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("departmentList", departmentList);
+        parameters.Add("readAction", true);
+        parameters.Add("idDepartment", idDepartment);
+
+        var dialogRef = DialogService.Show<Pages.DialogArticle>("Nuevo Articulo", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+            StateHasChanged();
+        }
+    }
+    private async Task updateArticle(DAL.DAO.Article article)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("departmentList", departmentList);
+        parameters.Add("readAction", true);
+        parameters.Add("idDepartment", idDepartment);
+        parameters.Add("article", article);
+        var dialogRef = DialogService.Show<Pages.DialogArticle>("Nuevo Articulo", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+            StateHasChanged();
+        }
+    }
+
+    //actualizar departma
+
+    protected override async Task OnInitializedAsync()
+    {
+        //obtener todos los articulos de ese departmaento                 
+        ArticlesByDepartment = await _departmentService.GetByIdAsync(idDepartment);
+        //obtener lista de familia
+        departmentList = await _departmentService.GetAll();
+
+    }
+}

@@ -9,7 +9,7 @@
 @inject NavigationManager NavigationManager
  
  
-    <MudTable Items="@Data" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DAL.DAO.Family,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <MudTable Items="@Data" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Family,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
         <ToolBarContent>
             <MudText Typo="Typo.h4">Familia</MudText>
             <MudSpacer />
@@ -28,7 +28,6 @@
                 <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Name">@context.Name</MudTd>
                 <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => OpenDialog(@context))" /></MudTd>
- 
         }
         </RowTemplate>
         <PagerContent>
@@ -39,10 +38,7 @@
    
   
 @code {
-    private bool dense = false;
-    private bool hover = true;
-    private bool striped = false;
-    private bool bordered = false;
+    
     private string searchString1 = "";
     private DAL.DAO.Family  selectedItem1 = null;
     private HashSet<DAL.DAO.Family> selectedItems = new HashSet<DAL.DAO.Family>();

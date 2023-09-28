@@ -16,7 +16,7 @@
     </div>
 </div> *@
 
-    <MudTable Items="@departmentList" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DAL.DAO.Department,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <MudTable Items="@departmentList" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Department,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
         <ToolBarContent>
             <MudText Typo="Typo.h4">Departamento</MudText>
             <MudSpacer />
@@ -34,7 +34,7 @@
         @if (departmentList.Any())
         {
             <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Name"><MudLink Href="@($"/department-article/{context.Id}")">@context.Name</MudLink></MudTd>
             <MudTd DataLabel="Name">@context.Family.Name</MudTd>
             <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => EditDepartment(@context))" /></MudTd>
         }
@@ -48,10 +48,7 @@
     public IEnumerable<DAL.DAO.Family> familyList = Array.Empty<DAL.DAO.Family>();
 
     //Filtro de la tabla
-    private bool dense = false;
-    private bool hover = true;
-    private bool striped = false;
-    private bool bordered = false;
+    
     private string searchString1 = "";
     private DAL.DAO.Department selectedItem1 = null;
     private HashSet<DAL.DAO.Department> selectedItems = new HashSet<DAL.DAO.Department>();
@@ -109,7 +106,7 @@
         }
     }
     //CAMBIOS GUARDADOS
-
+   
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();

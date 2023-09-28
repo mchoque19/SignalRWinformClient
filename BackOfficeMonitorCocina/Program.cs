@@ -34,6 +34,7 @@ builder.Services.AddScoped<IPasswordHasher,PasswordHasher>();
 builder.Services.AddScoped<MonitorService>();
 builder.Services.AddScoped<StateService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DepartmentService>();
 //autenticacion
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, AutenticacionExtension>();

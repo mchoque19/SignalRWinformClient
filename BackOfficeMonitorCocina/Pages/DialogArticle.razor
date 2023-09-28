@@ -1,0 +1,87 @@
+﻿@using MudBlazor;
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _departmentService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _articleService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="@article.Name" Label="Nombre" />
+        <MudSelect T="int" Label="Familia" AnchorOrigin="Origin.BottomCenter" @bind-Value="idDepartment" ReadOnly="@readAction">
+            @foreach (var item in departmentList)
+            {
+                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+@code {
+    //obtener informacion del articulo
+    //para editar
+    [Parameter] public DAL.DAO.Article article { get; set; } = new DAL.DAO.Article();
+    //obtener la id de la familia por parametro
+    [Parameter] public int idDepartment { get; set; }
+    public DAL.DAO.Department department { get; set; } = new DAL.DAO.Department();
+    //obtenr la lsta de las familasr
+    [Parameter]
+    public IEnumerable<DAL.DAO.Department> departmentList { get; set; } = Array.Empty<DAL.DAO.Department>();
+    //obtenr boolean de activo/desactivo
+    [Parameter] public bool readAction { get; set; } = false;
+
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = default!;
+
+    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    {
+        if (article.Id != 0)
+        {
+            Console.WriteLine("update");
+            department = await _departmentService.GetByIdAsync(idDepartment);
+            article.Department = department;
+            var response = _articleService.Update(article);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+        else
+        {
+            Console.WriteLine("save");
+            department = await _departmentService.GetByIdAsync(idDepartment);
+            article.Department = department;
+            var response = _articleService.Insert(article);           
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+
+    }
+}
