@@ -1,49 +1,95 @@
-﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _ArticleRespository
+﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _articleService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _departmentService
+
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
-
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
 @page "/article"
-<h3>Article</h3>
-<div class="row">
-    <div class="col-12 text-aling-right">
-        <a href="articleNew">Nuevo</a>
-    </div>
-</div>
-@if (Data.Any())
+
+<MudTable Items="@listArticles" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Article,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">Articulos</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(saveArticle)" Variant="Variant.Filled" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Nombre</MudTh>
+        <MudTh>Departamento</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        @if (listArticles.Any())
+        {  
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Department">@context.Department.Name</MudTd>
+            <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => updateArticle(@context, @context.Department.Id))" /></MudTd>
+        }
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+
+ 
+@code 
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Departamento</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-
-            @foreach (DAL.DAO.Article item in Data)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.Name</td>
-                    <td>@item.Department.Name</td>
-                    <td> <a href="/articleNew/@item.Id">Editar</a> </td>
-                    @* <td><a href="/eliminar/@item.Id">Eliminar</a></td> *@
-                </tr>
-            }
-
-        </tbody>
-    </table>
-}
-@code {
-    private IEnumerable<DAL.DAO.Article> Data = Array.Empty<DAL.DAO.Article>();
+    //visualizar todos los articulos
+    private IEnumerable<DAL.DAO.Article> listArticles = Array.Empty<DAL.DAO.Article>();
+    //obtener lista de departamentos
+    [Parameter]
+    public IEnumerable<DAL.DAO.Department> departmentList { get; set; } = Array.Empty<DAL.DAO.Department>();
 
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        Data = await _ArticleRespository.GetAll();
+        listArticles = await _articleService.GetAll();
+        departmentList = await _departmentService.GetAll();
     }
 
+    private async Task saveArticle()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("departmentList", departmentList);
+        var dialogRef = DialogService.Show<Pages.DialogArticle>("Nuevo Articulo", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {            
+            departmentList = await _departmentService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task updateArticle(DAL.DAO.Article article, int id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("departmentList", departmentList);
+        parameters.Add("idDepartment", id);
+        parameters.Add("article", article);
+        var dialogRef = DialogService.Show<Pages.DialogArticle>("Nuevo Articulo", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+            StateHasChanged();
+        }
+    }
+    //Inicio Tabla     
+    private string searchString1 = "";
+    private DAL.DAO.Article selectedItem1 = null;
+    private HashSet<DAL.DAO.Article> selectedItems = new HashSet<DAL.DAO.Article>();
+    private IEnumerable<DAL.DAO.Article> Elements = new List<DAL.DAO.Article>();   
+    private bool FilterFunc1(DAL.DAO.Article element) => FilterFunc(element, searchString1);
+    private bool FilterFunc(DAL.DAO.Article element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name} {element.Department}".Contains(searchString))
+            return true;
+        return false;
+    }
 }

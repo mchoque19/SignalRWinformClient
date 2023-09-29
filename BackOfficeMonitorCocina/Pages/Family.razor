@@ -90,7 +90,6 @@
 
     private async void AddFamilyDialog()
     {           
-        //prueba
         var dialogParameters = new DialogParameters();
         var dialog = DialogService.Show<Pages.DialogNew>("Nueva Familia", dialogParameters);
         var result = await dialog.Result;

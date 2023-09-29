@@ -8,7 +8,6 @@
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
 
-<h3>MonitorArticle</h3>
 <p>@monitor.Name</p>
 
 <EditForm Model="monitor">
@@ -100,6 +99,7 @@
 </table>
 
 @code {
+    //PANTALLA A BORRAR
     [Parameter]
     public int Id { get; set; }
     public int IdArticle { get; set; }
@@ -189,7 +189,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         Data = await _ArticleRepository.GetAll(); 
         monitor = await _MonitorRepository.GetByIdAsync(Id);        
         @foreach (var article in monitor.Articles)

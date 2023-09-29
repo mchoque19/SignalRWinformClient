@@ -3,7 +3,6 @@
 
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
-@* mudblazor *@
 @inject IDialogService DialogService
 @using BackOfficeMonitorCocina.Pages
 @inject NavigationManager NavigationManager
@@ -35,7 +34,7 @@
         {
             <MudTd DataLabel="Id">@context.Id</MudTd>
             <MudTd DataLabel="Name"><MudLink Href="@($"/department-article/{context.Id}")">@context.Name</MudLink></MudTd>
-            <MudTd DataLabel="Name">@context.Family.Name</MudTd>
+            <MudTd DataLabel="Family">@context.Family.Name</MudTd>
             <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => EditDepartment(@context))" /></MudTd>
         }
         </RowTemplate>

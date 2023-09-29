@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<MudPaper Elevation="25">
+    <MudToolBar>
+        <MudButton Href="@($"/state/{idMonitor}")"
+                   Rel="nofollow"
+                   Variant="Variant.Filled"
+                   EndIcon="@Icons.Custom.Brands.GitHub"
+                   Color="Color.Primary">
+            Estados
+        </MudButton>
+        <MudButton Href="@($"/family/{idMonitor}")"
+                   Rel="nofollow"
+                   Variant="Variant.Filled"
+                   EndIcon="@Icons.Custom.Brands.GitHub"
+                   Color="Color.Primary">
+            Familia
+        </MudButton>
+    </MudToolBar>
+</MudPaper>
+@code {
+    [Parameter]
+    public int? idMonitor { get; set; }
+}

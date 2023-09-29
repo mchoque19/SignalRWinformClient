@@ -1,0 +1,66 @@
+﻿@using MudBlazor;
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _stateService
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="@state.Name" Label="Nombre" />
+        <MudNumericField @bind-Value="state.Order" Label="Orden" Variant="Variant.Text" Min="0"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+@code {
+
+    [Parameter] public DAL.DAO.State state { get; set; } = new DAL.DAO.State();
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = default!;
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task Save()
+    { 
+        if (state.Id != 0)
+        {
+            await base.OnInitializedAsync();
+            var response = _stateService.Update(state);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+
+        }
+        else
+        {
+            await base.OnInitializedAsync();
+            var response = _stateService.Insert(state);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+    }
+}

@@ -1,0 +1,9 @@
+﻿@page "/family/{idMonitor:int}"
+<NavMonitor idMonitor="idMonitor" />
+
+<h3>MonitorFamily</h3>
+
+@code {
+    [Parameter]
+    public int idMonitor { get; set; }
+}

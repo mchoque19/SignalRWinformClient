@@ -9,7 +9,6 @@
 @attribute [Authorize]
 @inject IDialogService DialogService
 @using BackOfficeMonitorCocina.Pages
-@inject NavigationManager NavigationManager
 
 <MudTable Items="@ArticlesByDepartment.Articles" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Article,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
     <ToolBarContent>
@@ -24,9 +23,12 @@
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
+      @if (ArticlesByDepartment.Articles.Any())
+        {
         <MudTd DataLabel="Nr">@context.Id</MudTd>
         <MudTd DataLabel="Sign">@context.Name</MudTd>
         <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => updateArticle(@context))" /></MudTd>
+        }
     </RowTemplate>
     <PagerContent>
         <MudTablePager />

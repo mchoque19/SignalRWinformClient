@@ -1,45 +1,97 @@
 ﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _MonitorRespository
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
+@inject NavigationManager NavigationManager
 
 @page "/monitor"
-<h3>Monitor</h3>
-<div class="row">
-    <div class="col-12 text-aling-right">
-        <a href="monitorNew">Nuevo</a>
-    </div>
-</div>
-@if (Data.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
 
-            @foreach (var item in Data)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td> <a href="/monitoArticle/@item.Id">@item.Name</a></td>
-                    <td> <a href="/monitorNew/@item.Id">Editar</a> </td>
-                    @* <td><a href="/eliminar/@item.Id">Eliminar</a></td> *@
-                </tr>
-            }
-
-        </tbody>
-    </table>
-}
+ 
+ 
+<MudTable Items="@monitorList" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Monitor,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">Monitor</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(addMonitor)" Variant="Variant.Filled" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh></MudTh>
+     </HeaderContent>
+    <RowTemplate>
+        @if (monitorList.Any())
+        {
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name"><MudLink Href="@($"/monitor/{context.Id}")">@context.Name</MudLink></MudTd>
+        <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => updateMonitor(@context))" /></MudTd>
+        }
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+ 
+ 
+ 
 @code {
-    private IEnumerable<DAL.DAO.Monitor> Data = Array.Empty<DAL.DAO.Monitor>();
+    private IEnumerable<DAL.DAO.Monitor> monitorList = Array.Empty<DAL.DAO.Monitor>();
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        Data = await _MonitorRespository.GetAll();
+        monitorList = await _MonitorRespository.GetAll();
     }
+
+
+    //Guardar y editar
+
+    private async Task addMonitor()
+    {
+        Console.WriteLine("Guardar monitor");
+        var parameters = new DialogParameters();  
+        var dialogRef = DialogService.Show<Pages.DialogMonitor>("Nuevo monitor", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+            monitorList = await _MonitorRespository.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    private async Task updateMonitor(DAL.DAO.Monitor monitor)
+    {
+        Console.WriteLine("Update monitor");
+        var parameters = new DialogParameters();
+        parameters.Add("monitor", monitor);
+        var dialogRef = DialogService.Show<Pages.DialogMonitor>("Editar monitor", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+           StateHasChanged();
+        }
+    }
+    //Tabla
+ 
+    private string searchString1 = "";
+    private DAL.DAO.Monitor selectedItem1 = null;
+    private HashSet<DAL.DAO.Monitor> selectedItems = new HashSet<DAL.DAO.Monitor>();
+
+    private IEnumerable<DAL.DAO.Monitor> Elements = new List<DAL.DAO.Monitor>(); 
+
+    private bool FilterFunc1(DAL.DAO.Monitor element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.Monitor element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true; 
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name}".Contains(searchString))
+            return true;
+        return false;
+    }
+
+
 }

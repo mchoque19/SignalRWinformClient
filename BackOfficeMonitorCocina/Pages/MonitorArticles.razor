@@ -1,0 +1,71 @@
+﻿@page "/monitor/{idMonitor:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+
+ 
+
+<NavMonitor idMonitor="idMonitor" />
+
+
+ 
+<MudTable Items="monitor.Articles" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Article,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">Articulos</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Nombre</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+       @if (monitor.Articles.Any())
+       {
+        <MudTd DataLabel="Nr">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+       }
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    [Parameter]
+    public int idMonitor { get; set; }
+    //obtener los articulos de este monitor
+
+    private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
+  
+  
+
+    protected override async Task OnInitializedAsync()
+    {
+        monitor = await _monitorService.GetByIdAsync(idMonitor);
+    }
+
+
+
+
+
+
+
+    //tabla  
+    private string searchString1 = "";
+    private DAL.DAO.Article selectedItem1 = null;
+    private HashSet<DAL.DAO.Article> selectedItems = new HashSet<DAL.DAO.Article>();
+
+    private IEnumerable<DAL.DAO.Article> Elements = new List<DAL.DAO.Article>(); 
+
+    private bool FilterFunc1(DAL.DAO.Article element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.Article element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name}".Contains(searchString))
+            return true;
+        return false;
+    }
+}

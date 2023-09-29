@@ -1,13 +1,14 @@
-﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _stateService
+﻿@page "/state/{idMonitor:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _stateService
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
-@inject ISnackbar Snackbar
 @inject IDialogService DialogService
-@using BackOfficeMonitorCocina.Pages
 
-@page "/state"
+<NavMonitor idMonitor="idMonitor" />
 
-<MudTable Items="@stateList" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.State,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+
+<MudTable Items="@monitor.States" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.State,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
     <ToolBarContent>
         <MudText Typo="Typo.h4">Estados</MudText>
         <MudSpacer />
@@ -16,79 +17,65 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>Id</MudTh>
-        <MudTh>Nombre</MudTh>
-        <MudTh>Order</MudTh>
-        <MudTh></MudTh>
+        <MudTh>Estado</MudTh>
     </HeaderContent>
     <RowTemplate>
-        @if (stateList.Any())
-        {
-        <MudTd DataLabel="Sign">@context.Id</MudTd>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Name">@context.Order</MudTd>
-        <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => updateState(@context))" /></MudTd>
-        }
+        <MudTd DataLabel="Nr">@context.Id</MudTd>
+        <MudTd DataLabel="Sign">@context.Name</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
 </MudTable>
  
- 
-@code {
+
+@code 
+{
+    //Se muestran todos los estados de un monitor 
+    [Parameter]
+    public int idMonitor { get; set; }
+    //obtener la lista de estados 
+    private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
+    //obtener la lista de los estado de es monitor
     private IEnumerable<DAL.DAO.State> stateList = Array.Empty<DAL.DAO.State>();
+    //solo se agrega y se borrar
 
     protected override async Task OnInitializedAsync()
     {
+        monitor = await _monitorService.GetByIdAsync(idMonitor);
         stateList = await _stateService.GetAll();
-    }
-
-
-    private async void addState()
-    {
-        var parameters = new DialogParameters();
-        var dialog = DialogService.Show<Pages.DialogState>("Nuevo estado", parameters);
-        var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            stateList = await _stateService.GetAll();
-            StateHasChanged();
-        }
 
     }
 
-    private async void updateState(DAL.DAO.State state)
+    //guardar estado del monitor
+
+    private async Task addState()
     {
-
         var parameters = new DialogParameters();
-        parameters.Add("state", state);
-        var dialog = DialogService.Show<Pages.DialogState>("Editar estado", parameters);
-        var result = await dialog.Result;
-
+        parameters.Add("stateList", stateList)
+        var dialogRef = DialogService.Show<Pages.DialogMonitorState>("Agregar Estado", parameters);
+        var result = await dialogRef.Result;
         if (!result.Canceled)
         {
+            monitor = await _monitorService.GetByIdAsync(idMonitor);
             StateHasChanged();
         }
     }
 
-    
+    //Tabla
     private string searchString1 = "";
     private DAL.DAO.State selectedItem1 = null;
     private HashSet<DAL.DAO.State> selectedItems = new HashSet<DAL.DAO.State>();
-
-    private IEnumerable<DAL.DAO.State> Elements = new List<DAL.DAO.State>();    
-
+    private IEnumerable<DAL.DAO.State> Elements = new List<DAL.DAO.State>();
     private bool FilterFunc1(DAL.DAO.State element) => FilterFunc(element, searchString1);
-
     private bool FilterFunc(DAL.DAO.State element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
-            return true;  
+            return true;
         if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if ($"{element.Id} {element.Name}".Contains(searchString))
             return true;
         return false;
-    }
+    }  
 }

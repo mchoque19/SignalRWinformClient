@@ -1,0 +1,70 @@
+﻿@page "/pagenew"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField @bind-Value="@monitor.Name" Label="Nombre" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" OnClick="save">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+@code {
+    private string input = string.Empty;
+    private string Id = string.Empty;
+
+    [Parameter] public DAL.DAO.Monitor monitor { get; set; } = new DAL.DAO.Monitor();
+
+
+
+    [CascadingParameter]
+    private MudDialogInstance MudDialog { get; set; } = default!;
+
+    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task save()
+    {
+        if (monitor.Id != 0)
+        {
+            await base.OnInitializedAsync();
+            var response = _monitorService.Update(monitor);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));             
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+        else
+        {
+            await base.OnInitializedAsync();
+            var response = _monitorService.Insert(monitor);
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }
+        }
+        
+    }
+      
+}
