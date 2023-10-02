@@ -1,16 +1,19 @@
 ﻿@page "/state/{idMonitor:int}"
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _stateService
+@inject DAL.Services.StateService stateService
+
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <NavMonitor idMonitor="idMonitor" />
 
 
 <MudTable Items="@monitor.States" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.State,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
     <ToolBarContent>
-        <MudText Typo="Typo.h4">Estados</MudText>
+        <MudText Typo="Typo.h4">@monitor.Name - Estados</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(addState)" Variant="Variant.Filled" />
@@ -18,10 +21,15 @@
     <HeaderContent>
         <MudTh>Id</MudTh>
         <MudTh>Estado</MudTh>
+        <MudTh>Borrar</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.Id</MudTd>
-        <MudTd DataLabel="Sign">@context.Name</MudTd>
+        @if (monitor.Articles.Any())
+        {
+            <MudTd DataLabel="Nr">@context.Id</MudTd>
+            <MudTd DataLabel="Sign">@context.Name</MudTd>
+            <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="edit" @onclick="@((e) => deleteState(@context))" /></MudTd>
+        }
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
@@ -38,12 +46,15 @@
     private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
     //obtener la lista de los estado de es monitor
     private IEnumerable<DAL.DAO.State> stateList = Array.Empty<DAL.DAO.State>();
+    private IEnumerable<DAL.DAO.State> GetStatesNotIncludedInMonitor = Array.Empty<DAL.DAO.State>();
     //solo se agrega y se borrar
 
     protected override async Task OnInitializedAsync()
     {
         monitor = await _monitorService.GetByIdAsync(idMonitor);
         stateList = await _stateService.GetAll();
+
+
 
     }
 
@@ -52,13 +63,31 @@
     private async Task addState()
     {
         var parameters = new DialogParameters();
-        parameters.Add("stateList", stateList)
+        parameters.Add("stateList", stateList);
+        parameters.Add("monitor", monitor);
         var dialogRef = DialogService.Show<Pages.DialogMonitorState>("Agregar Estado", parameters);
         var result = await dialogRef.Result;
         if (!result.Canceled)
         {
             monitor = await _monitorService.GetByIdAsync(idMonitor);
             StateHasChanged();
+        }
+    }
+    // eliminar estado
+
+    private async Task deleteState(DAL.DAO.State state)
+    {
+        Console.WriteLine("borrar estado");
+        var response = stateService.deleteMonitorStatus(monitor, state.Id);
+        if (response)
+        {
+            Snackbar.Add("Se borro correctamente", Severity.Success);
+            Console.WriteLine("exito");
+        }
+        else
+        {
+            Snackbar.Add("Error al guardar", Severity.Error);
+            Console.WriteLine("bad");
         }
     }
 

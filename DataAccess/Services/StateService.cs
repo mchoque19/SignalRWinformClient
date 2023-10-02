@@ -55,10 +55,20 @@ namespace DAL.Services
 
         public bool addStatInMonitorn(DAO.Monitor monitor, int stateId)
         {
-            State state = _context.State
+            try
+            {
+                State state = _context.State
                          .Where(p => p.Id == stateId)
                          .First();
-            monitor.States.Add(state);
+
+
+                monitor.States.Add(state);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("erro al guarrdar");
+            }
+       
             return Save();
         }
 
@@ -72,6 +82,11 @@ namespace DAL.Services
             return Save();
         }
 
-         
+        //obtener estados del monitor 
+        //public async Task<IEnumerable<State>> GetStatesNotIncludedInMonitor(DAO.Monitor monitor)
+        //{
+                                   
+        //    return await _context.State.ToListAsync();
+        //}
     }
 }

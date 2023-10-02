@@ -51,7 +51,6 @@
         if(department.Id != 0)
         {
             //actualizar 
-            await base.OnInitializedAsync();
             family = await _FamilyService.GetByIdAsync(idFamily);
             department.Family = family;
             var response = _DepartmentService.Update(department);
@@ -70,7 +69,6 @@
         }
         else
         {
-            await base.OnInitializedAsync();
             //GUARDAR
             family = await _FamilyService.GetByIdAsync(idFamily);
             department.Family = family;

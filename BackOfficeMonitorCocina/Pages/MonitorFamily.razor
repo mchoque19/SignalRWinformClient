@@ -1,9 +1,67 @@
 ﻿@page "/family/{idMonitor:int}"
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+
 <NavMonitor idMonitor="idMonitor" />
 
-<h3>MonitorFamily</h3>
+<MudTable Items="monitor.Families" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Family,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">@monitor.Name - Familias</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(addFamiy)" Variant="Variant.Filled" />
+
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Nombre</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        @if (monitor.Families.Any())
+        {
+            <MudTd DataLabel="Nr">@context.Id</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+        }
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 
 @code {
     [Parameter]
     public int idMonitor { get; set; }
+
+    private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
+
+    protected override async Task OnInitializedAsync()
+    {
+        monitor = await _monitorService.GetByIdAsync(idMonitor);
+    }
+
+
+    private async Task addFamily()
+    {
+        
+    }
+
+    //tabla
+    private string searchString1 = "";
+    private DAL.DAO.Family selectedItem1 = null;
+    private HashSet<DAL.DAO.Family> selectedItems = new HashSet<DAL.DAO.Family>();
+
+    private IEnumerable<DAL.DAO.Family> Elements = new List<DAL.DAO.Family>();
+
+    private bool FilterFunc1(DAL.DAO.Family element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.Family element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name}".Contains(searchString))
+            return true;
+        return false;
+    }
 }
