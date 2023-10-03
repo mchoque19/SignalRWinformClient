@@ -4,7 +4,7 @@
 @inject DAL.Services.FamilyService familyService
 <MudDialog>
     <DialogContent>
-        <MudSelect T="int" MultiSelection="true" SelectAll="true"
+   @*      <MudSelect T="int" MultiSelection="true" SelectAll="true"
                    SelectAllText="Seleccionar"
         @bind-Value="value"
         @bind-SelectedValues="options"
@@ -13,6 +13,14 @@
             @foreach (var item in familyList)
             {
                 <MudSelectItem T="int" Value="@item.Id">@item.Name</MudSelectItem>
+            }
+        </MudSelect> *@
+
+
+        <MudSelect T="DAL.DAO.Family" Label="Familia" AnchorOrigin="Origin.BottomCenter"    >
+            @foreach (var item in familyList)
+            {
+                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
             }
         </MudSelect>
 

@@ -1,11 +1,36 @@
 ﻿@page "/monitor/{idMonitor:int}"
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
-
+@using Microsoft.AspNetCore.Components
+@using System.Globalization;
  
 
 <NavMonitor idMonitor="idMonitor" />
 
+<MudGrid>
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+         
+           
+            <MudSelect @bind-Value="stringValue" Label="Select fast-food" HelperText="String" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
+                @foreach (var item in familyList)
+                {
+                    <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
 
+
+            <MudSelect @bind-Value="stringValue" Label="Select fast-food" HelperText="String" Placeholder="Please Select" AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary">
+                <MudSelectItem Value="@("Pizza")" Disabled="true">Pizza (Disabled)</MudSelectItem>
+                <MudSelectItem Value="@("Burger")">Burger</MudSelectItem>
+                <MudSelectItem Value="@("Hotdog")">Hot Dog</MudSelectItem>
+            </MudSelect>
+       
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-10 ml-4">Guardar</MudButton>
+        </MudPaper>
+    </MudItem>   
+</MudGrid>
+
+ 
  
 <MudTable Items="monitor.Articles" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Article,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
     <ToolBarContent>
@@ -20,7 +45,7 @@
     <RowTemplate>
        @if (monitor.Articles.Any())
        {
-        <MudTd DataLabel="Nr">@context.Id</MudTd>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
        }
     </RowTemplate>
@@ -32,16 +57,38 @@
 @code {
     [Parameter]
     public int idMonitor { get; set; }
-    //obtener los articulos de este monitor
+    //obtener info de este monitor
+    private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();  
+    // Agregar articulos
+    private IEnumerable<DAL.DAO.Family> familyList = new List<DAL.DAO.Family>();
 
-    private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
-  
+
+    private string stringValue { get; set; }
+    private Drink enumValue { get; set; } = Drink.HotWater;
+    public enum Drink { Tea, SparklingWater, SoftDrink, Cider, Beer, Wine, Moonshine, Wodka, Cola, GreeTea, FruitJuice, Lemonade, HotWater, SpringWater, IceWater, }
+    private CultureInfo cultureValue { get; set; }
+    private Func<CultureInfo, string> convertFunc = ci => ci?.DisplayName;
+
+    //fin
+
     protected override async Task OnInitializedAsync()
     {
         monitor = await _monitorService.GetByIdAsync(idMonitor);
-    } 
-     
+        @foreach (var item in monitor.Families)
+        {
+           
+            familyList.Append(item); 
+        }
+        Console.WriteLine("##############");
 
+        @foreach (var item in familyList)
+        {
+            Console.WriteLine(item.Id);
+            Console.WriteLine(item.Name);
+        }
+
+    } 
+ 
     //tabla  
     private string searchString1 = "";
     private DAL.DAO.Article selectedItem1 = null;
