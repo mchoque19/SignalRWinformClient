@@ -1,22 +1,16 @@
-﻿@using MudBlazor;;
-
-@inject DAL.Services.StateService stateService
-@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+﻿@using MudBlazor;
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
-
-@using System.Linq
-
-
+@inject DAL.Services.FamilyService familyService
 <MudDialog>
-    <DialogContent> 
-        <MudSelect T="int" MultiSelection="true" SelectAll="true" 
-            SelectAllText="Seleccionar" 
-             @bind-Value="value"
-            @bind-SelectedValues="options"
+    <DialogContent>
+        <MudSelect T="int" MultiSelection="true" SelectAll="true"
+                   SelectAllText="Seleccionar"
+        @bind-Value="value"
+        @bind-SelectedValues="options"
                    MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))"
-                Label="Estados" AdornmentIcon="@Icons.Material.Filled.Search">
-            @foreach (var item in stateList)
+                   Label="Familia" AdornmentIcon="@Icons.Material.Filled.Search">
+            @foreach (var item in familyList)
             {
                 <MudSelectItem T="int" Value="@item.Id">@item.Name</MudSelectItem>
             }
@@ -25,38 +19,35 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton> 
+        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
     </DialogActions>
 </MudDialog>
 
 
-
 @code {
-
     //Para ESTADO
     [Parameter] public DAL.DAO.Monitor monitor { get; set; } = new DAL.DAO.Monitor();
     [Parameter]
-    public IEnumerable<DAL.DAO.State> stateList { get; set; } = Array.Empty<DAL.DAO.State>();
+    public IEnumerable<DAL.DAO.Family> familyList { get; set; } = Array.Empty<DAL.DAO.Family>();
     private int value { get; set; }
-    private IEnumerable<int> options { get; set; } = new HashSet<int>();   
+    private IEnumerable<int> options { get; set; } = new HashSet<int>();
     private string GetMultiSelectionText(List<string> selectedValues)
     {
-        return $"Se han seleccionado {selectedValues.Count}";
-    }   
+        return $"Se ha seleccionado {selectedValues.Count}";
+    }
     //fin
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
 
     void Cancel() => MudDialog.Cancel();
- 
     private async Task Save()
     {
         Console.WriteLine("####################");
-        foreach (var idState in options)
+        foreach (var idFamily in options)
         {
-            Console.WriteLine(idState);
-            var response = stateService.addStatInMonitorn(monitor, idState);
+            Console.WriteLine(idFamily);
+            var response = familyService.addFamilyInMonitor(monitor, idFamily);
             if (response)
             {
                 Snackbar.Add("Se guardo correctamente", Severity.Success);
@@ -71,5 +62,4 @@
             }
         }
     }
-
 }

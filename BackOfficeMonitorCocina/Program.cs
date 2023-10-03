@@ -35,6 +35,7 @@ builder.Services.AddScoped<MonitorService>();
 builder.Services.AddScoped<StateService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<FamilyService>();
 //autenticacion
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, AutenticacionExtension>();

@@ -54,5 +54,22 @@ namespace DAL.Services
             return Save();
         }
 
+        public bool addFamilyInMonitor(DAO.Monitor monitor, int familyId)
+        {
+            try
+            {
+                Family family = _context.Family
+                         .Where(p => p.Id == familyId)
+                         .First();
+
+
+                monitor.Families.Add(family);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error al guardar familia en monitor");
+            }
+            return Save();
+        }
     }
 }

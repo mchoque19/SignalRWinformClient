@@ -2,17 +2,22 @@
 
 <MudPaper Elevation="25">
     <MudToolBar>
+        <MudButton Href="@($"/monitor/{idMonitor}")"
+                   Rel="nofollow"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary" Class="mr-10">
+            Articulos
+        </MudButton>
+
         <MudButton Href="@($"/state/{idMonitor}")"
                    Rel="nofollow"
                    Variant="Variant.Filled"
-                   EndIcon="@Icons.Custom.Brands.GitHub"
-                   Color="Color.Primary">
+                   Color="Color.Primary" Class="mr-10">
             Estados
         </MudButton>
         <MudButton Href="@($"/family/{idMonitor}")"
                    Rel="nofollow"
                    Variant="Variant.Filled"
-                   EndIcon="@Icons.Custom.Brands.GitHub"
                    Color="Color.Primary">
             Familia
         </MudButton>

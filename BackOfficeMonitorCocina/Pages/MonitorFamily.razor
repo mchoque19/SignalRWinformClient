@@ -1,14 +1,15 @@
 ﻿@page "/family/{idMonitor:int}"
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _familyService
+@inject IDialogService DialogService
 
 <NavMonitor idMonitor="idMonitor" />
-
 <MudTable Items="monitor.Families" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Family,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
     <ToolBarContent>
         <MudText Typo="Typo.h4">@monitor.Name - Familias</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(addFamiy)" Variant="Variant.Filled" />
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(addFamily)" Variant="Variant.Filled" />
 
     </ToolBarContent>
     <HeaderContent>
@@ -31,18 +32,31 @@
 @code {
     [Parameter]
     public int idMonitor { get; set; }
-
     private DAL.DAO.Monitor monitor = new DAL.DAO.Monitor();
+    //obtener lista de familias
+    private IEnumerable<DAL.DAO.Family> familyList = Array.Empty<DAL.DAO.Family>();
+
+
 
     protected override async Task OnInitializedAsync()
     {
         monitor = await _monitorService.GetByIdAsync(idMonitor);
+        familyList = await _familyService.GetAll();
     }
 
 
     private async Task addFamily()
     {
-        
+        var parameters = new DialogParameters();
+        parameters.Add("familyList", familyList);
+        parameters.Add("monitor", monitor);
+        var dialogRef = DialogService.Show<Pages.DialogMonitorFamily>("Agregar Familia", parameters);
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+            monitor = await _monitorService.GetByIdAsync(idMonitor);
+            StateHasChanged();
+        }        
     }
 
     //tabla
