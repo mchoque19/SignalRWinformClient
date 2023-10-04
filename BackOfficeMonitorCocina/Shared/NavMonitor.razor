@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 
-<MudPaper Elevation="25">
+@* <MudPaper Elevation="25"> *@
     <MudToolBar>
         <MudButton Href="@($"/monitor/{idMonitor}")"
                    Rel="nofollow"
@@ -22,7 +22,7 @@
             Familia
         </MudButton>
     </MudToolBar>
-</MudPaper>
+@* </MudPaper> *@
 @code {
     [Parameter]
     public int? idMonitor { get; set; }

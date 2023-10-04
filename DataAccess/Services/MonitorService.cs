@@ -18,7 +18,7 @@ namespace DAL.Services
         {
             _context = context;
         }
-
+       
         public bool Delete(DAO.Monitor monitor)
         {
             _context.Remove(monitor);
@@ -58,10 +58,9 @@ namespace DAL.Services
             Article article = _context.Article
                          .Where(p => p.Id == articleId)
                          .First();
-            monitor.Articles.Add(article);            
+            monitor.Articles.Add(article);
             return Save();
         }
-
         public bool DeleteArticleOfMonitor(DAO.Monitor monitor, int articleId)
         {
             Article article = _context.Article
@@ -71,6 +70,11 @@ namespace DAL.Services
             monitor.Articles.Remove(article);
             return Save();
         }
+
+        //public async Task<IEnumerable<DAO.Monitor>> getDepartmentOfFamilyByMonitor(DAO.Monitor monitor, )
+        //{
+        //    return await _context.Monitor.ToListAsync();
+        //}
 
     }
 }
