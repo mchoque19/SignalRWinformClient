@@ -32,7 +32,7 @@ namespace DAL.Services
 
         public async Task<DAO.Monitor> GetByIdAsync(int id)
         {
-            return await _context.Monitor.FirstOrDefaultAsync(i => i.Id == id);
+            return await _context.Monitor.FirstAsync(i => i.Id == id);
         }
 
         public bool Insert(DAO.Monitor monitor)
@@ -69,12 +69,7 @@ namespace DAL.Services
 
             monitor.Articles.Remove(article);
             return Save();
-        }
-
-        //public async Task<IEnumerable<DAO.Monitor>> getDepartmentOfFamilyByMonitor(DAO.Monitor monitor, )
-        //{
-        //    return await _context.Monitor.ToListAsync();
-        //}
+        }     
 
     }
 }

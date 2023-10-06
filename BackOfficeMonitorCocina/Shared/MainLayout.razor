@@ -4,7 +4,7 @@
 @inject AuthenticationStateProvider autenticacionProvider
 @inject NavigationManager navManager
  
-<MudThemeProvider />
+<MudThemeProvider Theme="MyCustomTheme" />
 <MudDialogProvider FullWidth="true"
                    MaxWidth="MaxWidth.ExtraSmall"
                    CloseButton="true"
@@ -35,4 +35,24 @@
     {
         _drawerOpen = !_drawerOpen;
     }
+
+    MudTheme MyCustomTheme = new MudTheme()
+        {
+            Palette = new PaletteLight()
+            {
+                Primary = "#20398c",
+                Secondary = "#20398c",
+                AppbarBackground = "#20398c",
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = "#20398c",
+            },
+
+            // LayoutProperties = new LayoutProperties()
+            // {
+            //     DrawerWidthLeft = "260px",
+            //     DrawerWidthRight = "300px"
+            // }
+        };
 }

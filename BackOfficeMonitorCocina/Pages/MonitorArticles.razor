@@ -1,5 +1,8 @@
 ﻿@page "/monitor/{idMonitor:int}"
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _articleService
+@inject DAL.Services.MonitorService monitorService
+
 @using Microsoft.AspNetCore.Components
 @using System.Globalization;
  
@@ -8,35 +11,52 @@
 
 
 <MudGrid>
-    <MudItem xs="12" sm="6" md="4">
+    <MudItem xs="12" sm="6" md="3">
         <MudSelect Placeholder="Selecciona una familia" T="DAL.DAO.Family" 
         Label="Familia"   Required="true" AdornmentIcon="@Icons.Material.Filled.Search"
-                   AdornmentColor="Color.Primary" ValueChanged="OnValueChanged">
-            @foreach (var selectItem in familyList)
+                   AdornmentColor="Color.Primary" ValueChanged="valueChangedSelectFamily">
+            @foreach (var family in familyList)
             {
-                <MudSelectItem Value="@selectItem">@selectItem.Name</MudSelectItem>
+                <MudSelectItem Value="@family">@family.Name</MudSelectItem>
             }
         </MudSelect>
     </MudItem>
-    <MudItem xs="12" sm="6" md="4">
-       
+    <MudItem xs="12" sm="6" md="3">
+     @if (departmentList.Any())
+        {
+            <MudSelect T="int" MultiSelection="true" SelectAll="true" SelectAllText="Seleccionar todos"
+            @bind-Value="value" SelectedValuesChanged="valueChangedSelectDepartment"
+                MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))"
+                    Label="Departamento" AdornmentIcon="@Icons.Material.Filled.Search">
+                @foreach (var department in departmentList)
+                {
+                    <MudSelectItem Value="@department.Id">@department.Name</MudSelectItem>
+                }
+            </MudSelect>          
+        } 
     </MudItem>
-
-    <MudItem xs="12" sm="6" md="4">
-        @* <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-10 ml-4">Guardar</MudButton> *@
+    <MudItem xs="12" sm="6" md="3">
+        @if (articlesList.Any())
+        {
+            <MudSelect T="int" MultiSelection="true" SelectAll="true" SelectAllText="Seleccionar todos"
+            @bind-Value="value" @bind-SelectedValues="options"
+                       MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))"
+                       Label="Articulos" AdornmentIcon="@Icons.Material.Filled.Add">
+                @foreach (var department in articlesList)
+                {
+                    <MudSelectItem Value="@department.Id">@department.Name</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+         @if (articlesList.Any())
+        {
+         <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mr-10 ml-4" @onclick="SaveArticle">Guardar</MudButton> 
+        }
     </MudItem>
 </MudGrid>
 
-      
-  
- 
-
-<div class="d-flex mud-width-full align-center mt-8">
-    <MudText Typo="Typo.subtitle1" Class="mr-2">Selected values: </MudText>
-    <MudChip Color="Color.Secondary">@(familySelect?.Name ?? "Select culture")</MudChip>
-</div>
- 
- 
 <MudTable Items="monitor.Articles" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Article,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
     <ToolBarContent>
         <MudText Typo="Typo.h4">Articulos</MudText>
@@ -46,12 +66,14 @@
     <HeaderContent>
         <MudTh>Id</MudTh>
         <MudTh>Nombre</MudTh>
+        <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
        @if (monitor.Articles.Any())
        {
         <MudTd DataLabel="Id">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="edit" @onclick="@((e) => DeleteArticle(@context))" /></MudTd>
        }
     </RowTemplate>
     <PagerContent>
@@ -69,29 +91,93 @@
     public DAL.DAO.Family familySelect { get; set; }
     //Seleccionar Departamento
     public List<DAL.DAO.Department> departmentList = new List<DAL.DAO.Department>();
-
-    //Seleccionar articulosmulti y guardar
-
- 
-    private void OnValueChanged(DAL.DAO.Family selected)
+    //el valor selecciona solo demuestra
+    private int value { get; set; }
+    //private IEnumerable<int> options { get; set; } = new HashSet<int>();
+    private string GetMultiSelectionText(List<string> selectedValues)
     {
-        Console.WriteLine(selected.Name);
-        //obtener todos los departamentos por familia 
-        departmentList
- 
+        return $"Se han seleccionado {selectedValues.Count}";
     }
+    //Seleccionar articulosmulti y guardar
+    public List<DAL.DAO.Article> articlesList = new List<DAL.DAO.Article>();
+    //private IEnumerable<int> selectedArticles { get; set; } = new HashSet<int>();
+    private IEnumerable<int> options { get; set; } = new HashSet<int>();
+
+    private IEnumerable<DAL.DAO.Article> articles = Array.Empty<DAL.DAO.Article>();
+    //fin
+
+    private void valueChangedSelectFamily(DAL.DAO.Family family)
+    {        
+        if (departmentList.Count > 0)
+        {
+            departmentList.Clear();
+            articlesList.Clear();
+        }
+       @foreach (var item in monitor.Departments)
+        {
+            if(item.Family == family)
+            {
+                departmentList.Add(item);
  
-  
+            }
+        }
+    }
+
+    private async Task DeleteArticle(DAL.DAO.Article article)
+    {
+        await base.OnInitializedAsync();
+        var response = monitorService.DeleteArticleOfMonitor(monitor, article.Id);
+        if (response)
+        {
+            Console.WriteLine("exito");
+        }
+        else
+        {
+            Console.WriteLine("bad");
+        }
+    }
+
+    private void valueChangedSelectDepartment(IEnumerable<int> values)
+    {
+        if (articlesList.Count > 0)
+        {
+            articlesList.Clear();
+        }
+        foreach(var article in articles)        
+        {
+            foreach(var dept in values)
+            {
+                if(article.Department.Id == dept)
+                {              
+                    articlesList.Add(article);
+                }
+                
+            }           
+        }       
+    }
+
     protected override async Task OnInitializedAsync()
     {    
         monitor = await _monitorService.GetByIdAsync(idMonitor);
+        articles = await _articleService.GetAll();
         @foreach (var item in monitor.Families)
-        {
+        {           
             familyList.Add(item);          
-        }            
-    } 
- 
-   
+        }
+    }
+
+    //Guardar articulos
+    private async Task SaveArticle()
+    {
+        if (options.Any())
+        {
+            foreach (var article in options)
+            {
+                var response = monitorService.InsertArticleInMonitor(monitor, article);
+            }
+        }          
+    }
+
     //tabla  
     private string searchString1 = "";
     private DAL.DAO.Article selectedItem1 = null;

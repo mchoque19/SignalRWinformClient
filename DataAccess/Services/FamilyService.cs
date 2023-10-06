@@ -62,8 +62,12 @@ namespace DAL.Services
                          .Where(p => p.Id == familyId)
                          .First();
 
-
                 monitor.Families.Add(family);
+                foreach(var item in family.Departments)
+                {
+                    monitor.Departments.Add(item);
+                }                                
+
             }
             catch (Exception e)
             {
