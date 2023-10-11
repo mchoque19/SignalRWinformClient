@@ -151,7 +151,7 @@
                 {              
                     articlesList.Add(article);
                 }
-                
+
             }           
         }       
     }
@@ -160,10 +160,14 @@
     {    
         monitor = await _monitorService.GetByIdAsync(idMonitor);
         articles = await _articleService.GetAll();
-        @foreach (var item in monitor.Families)
-        {           
-            familyList.Add(item);          
+        if(monitor.Families.Any())
+        {
+            @foreach (var item in monitor.Families)
+            {
+                familyList.Add(item);
+            }
         }
+ 
     }
 
     //Guardar articulos

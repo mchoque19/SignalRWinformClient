@@ -18,6 +18,7 @@
         <MudTh>Id</MudTh>
         <MudTh>Nombre</MudTh>
         <MudTh>Order</MudTh>
+        <MudTh>Color</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -26,6 +27,14 @@
         <MudTd DataLabel="Sign">@context.Id</MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Name">@context.Order</MudTd>
+ 
+            <MudColorPicker DisableToolbar="true" DisableAlpha="true"
+                DisableColorField="true" DisablePreview="false"
+                            DisableSliders="true" DisableInputs="true"
+                            DisableModeSwitch="true"  
+            @bind-Text="@context.Color"
+                            PickerVariant="PickerVariant.Static"  />
+
         <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => updateState(@context))" /></MudTd>
         }
     </RowTemplate>
@@ -36,6 +45,8 @@
  
  
 @code {
+    public ColorPickerMode ColorPickerMode { get; set; }
+
     private IEnumerable<DAL.DAO.State> stateList = Array.Empty<DAL.DAO.State>();
 
     protected override async Task OnInitializedAsync()

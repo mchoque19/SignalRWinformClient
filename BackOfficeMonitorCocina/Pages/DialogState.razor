@@ -7,6 +7,8 @@
     <DialogContent>
         <MudTextField @bind-Value="@state.Name" Label="Nombre" />
         <MudNumericField @bind-Value="state.Order" Label="Orden" Variant="Variant.Text" Min="0"/>
+        <MudColorPicker @bind-Text="state.Color" Label="Color" ColorPickerView="ColorPickerView.Spectrum" />
+        <MudSwitch @bind-Checked="@state.Marchando" Label="Marchando" Color="Color.Primary" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
