@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackOfficeMonitorCocina.Models;
+namespace MonitorCocinaApi.Models;
 
 [Table("Order")]
 public partial class Order

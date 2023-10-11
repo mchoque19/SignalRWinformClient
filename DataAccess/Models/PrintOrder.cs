@@ -4,22 +4,16 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackOfficeMonitorCocina.Models;
+namespace DAL.Models;
 
-[Table("State")]
-public partial class State
+[Table("PrintOrder")]
+public partial class PrintOrder
 {
     [Key]
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
-    public int Order { get; set; }
-
-    [InverseProperty("State")]
+    [InverseProperty("PrintOrderGroup")]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
-    [ForeignKey("StatesId")]
-    [InverseProperty("States")]
-    public virtual ICollection<Monitor> Monitors { get; set; } = new List<Monitor>();
 }

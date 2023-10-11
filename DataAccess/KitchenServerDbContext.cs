@@ -6,6 +6,9 @@ namespace DAL
 {
     public class KitchenServerDbContext : DbContext
     {
+        public KitchenServerDbContext()
+        {
+        }
         public KitchenServerDbContext(DbContextOptions<KitchenServerDbContext> options) : base(options) { }
  
         public DbSet<OrderItem> OrderItem { get; set; }

@@ -12,7 +12,7 @@
 
 <EditForm Model="@user" OnValidSubmit="LoginSubmit">
     <DataAnnotationsValidator />
-    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center">
+    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Class="align-content-center">
         <MudItem xs="12" sm="7">
             <MudCard>
                 <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
@@ -22,7 +22,7 @@
                     <MudTextField Label="Contraseña" Class="mt-3"
                     @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
                 </MudCardContent>
-                <div class="d-flex align-center justify-center">               
+                <div class="d-flex align-center justify-center">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mb-3">Iniciar sesión</MudButton>
                 </div>
             </MudCard>
@@ -59,6 +59,4 @@
         }
     }
 }
-
- 
- 
+    

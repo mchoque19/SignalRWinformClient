@@ -6,14 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BackOfficeMonitorCocina.Models;
 
-[Table("PrintOrder")]
-public partial class PrintOrder
+[Table("User")]
+public partial class User
 {
     [Key]
     public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string Username { get; set; } = null!;
 
-    [InverseProperty("PrintOrderGroup")]
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    public string Password { get; set; } = null!;
 }

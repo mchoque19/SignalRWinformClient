@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackOfficeMonitorCocina.Models;
+namespace DAL.Models;
 
 [Table("Monitor")]
 public partial class Monitor

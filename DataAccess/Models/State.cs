@@ -2,29 +2,29 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackOfficeMonitorCocina.Models;
+namespace DAL.Models;
 
-[Table("Article")]
-[Index("DepartmentId", Name = "IX_Article_DepartmentId")]
-public partial class Article
+[Table("State")]
+public partial class State
 {
     [Key]
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
-    public int DepartmentId { get; set; }
+    public int Order { get; set; }
 
-    [ForeignKey("DepartmentId")]
-    [InverseProperty("Articles")]
-    public virtual Department Department { get; set; } = null!;
+    public string Color { get; set; }
 
-    [InverseProperty("Article")]
+    public bool Marchando { get; set; }
+
+    [InverseProperty("State")]
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
-    [ForeignKey("ArticlesId")]
-    [InverseProperty("Articles")]
+    [ForeignKey("StatesId")]
+    [InverseProperty("States")]
     public virtual ICollection<Monitor> Monitors { get; set; } = new List<Monitor>();
 }
