@@ -35,7 +35,7 @@ namespace DAL.Services
 
         public async Task<User> GetByIdAsync(int id)
         {
-            return await _context.User.FirstOrDefaultAsync(i => i.Id == id);
+            return await _context.User.FirstAsync(i => i.Id == id);
         }
 
         public bool Insert(User user)

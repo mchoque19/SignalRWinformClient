@@ -10,11 +10,12 @@
 @using System.ComponentModel.DataAnnotations
 @inject ISnackbar Snackbar
 
-<EditForm Model="@user" OnValidSubmit="LoginSubmit">
+<MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">       
+    <EditForm Model="@user" OnValidSubmit="LoginSubmit">
     <DataAnnotationsValidator />
-    <MudGrid Justify="Justify.Center" AlignItems="AlignItems.Center" Class="align-content-center">
+        <MudGrid Justify="Justify.Center" Spacing="6" Class="mt-16">
         <MudItem xs="12" sm="7">
-            <MudCard>
+                <MudCard  Class="mt-16">
                 <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
                 <MudCardContent>
                     <MudTextField Label="Usuario"
@@ -28,11 +29,17 @@
             </MudCard>
         </MudItem>
     </MudGrid>
-</EditForm>
+</EditForm> 
+</MudContainer>
 
 @code {
     DAL.DAO.User user = new DAL.DAO.User();
+
+   
+
     DAL.DTO.SessionDto sesionUser = new DAL.DTO.SessionDto();
+    //validacion 
+
 
     private async Task LoginSubmit()
     {
