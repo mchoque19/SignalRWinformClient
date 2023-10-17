@@ -1,10 +1,17 @@
 ﻿@page "/"
+ 
+@* @using BackOfficeMonitorCocina.Services; *@
 @using BackOfficeMonitorCocina.Shared;
+@using BackOfficeMonitorCocina.DTO;
+ 
+
 @layout LoginLayout
 @using BackOfficeMonitorCocina.Extensiones
+@using DAL.Services;
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider autenticationProvide
-@inject DAL.Services.UserService userService
+@inject UserService userService
+
 @inject NavigationManager NavigationManager
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
@@ -18,9 +25,9 @@
                 <MudCard  Class="mt-16">
                 <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
                 <MudCardContent>
-                    <MudTextField Label="Usuario"
-                    @bind-Value="user.Username" For="@(() => user.Username)" />
-                    <MudTextField Label="Contraseña" Class="mt-3"
+                        <MudTextField Label="Usuario" 
+                        @bind-Value="user.Username" For="@(() => user.Username)" />
+                        <MudTextField Label="Contraseña" Class="mt-3"
                     @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
                 </MudCardContent>
                 <div class="d-flex align-center justify-center">
@@ -30,40 +37,25 @@
         </MudItem>
     </MudGrid>
 </EditForm> 
-</MudContainer>
-
+</MudContainer>              
 @code {
+    bool success; 
     DAL.DAO.User user = new DAL.DAO.User();
-
-   
-
-    DAL.DTO.SessionDto sesionUser = new DAL.DTO.SessionDto();
-    //validacion 
-
-
-    private async Task LoginSubmit()
+    SessionDto sesionUser = new SessionDto();
+    private async Task LoginSubmit(EditContext context)
     {
+        success = true;      
         try
         {
             sesionUser = await userService.Login(user);
+            var autenticacionExt = (AutenticacionExtension)autenticationProvide;
+            await autenticacionExt.ActualizarEstadoAutenticacion(sesionUser);
+            NavigationManager.NavigateTo("/index");
         }
         catch
         {
-            Snackbar.Add("Usuario o contrasenya incorrectos", Severity.Error);
-
-        }
-
-        if (sesionUser != null)
-        {
-            var autenticacionExt = (AutenticacionExtension)autenticationProvide;
-            await autenticacionExt.ActualizarEstadoAutenticacion(sesionUser);
-
-            NavigationManager.NavigateTo("/index");
-        }
-        else
-        {
-            Snackbar.Add("Usuario o contrasenya incorrectos", Severity.Error);
-        }
+            Snackbar.Add("Usuario o contraseña incorrectos", Severity.Error);
+        }              
     }
 }
     

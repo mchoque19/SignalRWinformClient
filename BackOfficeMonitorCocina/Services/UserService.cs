@@ -1,19 +1,15 @@
-﻿using DAL.DAO;
-using DAL.DTO;
-using DAL.Interfaces;
-using DAL.Util;
+﻿using BackOfficeMonitorCocina.DTO;
+using BackOfficeMonitorCocina.Interfaces;
+using DAL;
+using DAL.DAO;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+ 
+ 
 namespace DAL.Services
 {
-    public class UserService : IGenericRepository<User>
+    public class UserService : DAL.Interfaces.IGenericRepository<DAL.DAO.User>
     {
-        private readonly KitchenServerDbContext _context;
+        private readonly DAL.KitchenServerDbContext _context;
         private readonly IPasswordHasher _passwordHasher;
 
         public UserService(KitchenServerDbContext context, IPasswordHasher passwordHasher)
@@ -63,20 +59,32 @@ namespace DAL.Services
         
         public async Task<SessionDto> Login(User user)
         {
-            User searchUser = _context.User
+            try
+            {
+                User searchUser = _context.User
                         .Where(p => p.Username == user.Username)
                         .First();
-            var result = _passwordHasher.Verify(searchUser.Password, user.Password);
 
-            if (!result)
-            {
-                throw new Exception("Username or password is not correct.");
+                var result = _passwordHasher.Verify(searchUser.Password, user.Password);
+
+                if (!result)
+                {
+                    throw new Exception("Username or password is not correct.");
+
+                }
+                Console.WriteLine("##########");
+                Console.WriteLine(result);
+                SessionDto sessionDto = new SessionDto();
+                sessionDto.username = searchUser.Username;
+                return sessionDto;
             }
-            //Cambiar lo que devuelve
-            SessionDto sessionDto = new SessionDto();
-            sessionDto.username = searchUser.Username;
-            return sessionDto;
-        }
-    
+            catch (Exception e)
+            { 
+                throw new Exception("Username or password no es correct.");                                
+            }                
+        } 
     }
+
+ 
+
 }

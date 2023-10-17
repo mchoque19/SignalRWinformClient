@@ -1,42 +1,39 @@
-﻿@using MudBlazor;
-@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _GenericRespository
+﻿@using BackOfficeMonitorCocina;
+@using BackOfficeMonitorCocina.DTO;
+@using MudBlazor;
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _familyService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
-<MudDialog>
-    <DialogContent>       
-        <MudTextField @bind-Value="@server.Name" Label="Nombre" />
-   </DialogContent>
-    <DialogActions>
-        <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
-    </DialogActions>
-</MudDialog>
-
- 
+<EditForm Model="@familyDto" OnValidSubmit="Save">
+<DataAnnotationsValidator/>
+    <MudDialog>
+        <DialogContent>
+            <MudTextField @bind-Value="@familyDto.Name" Label="Nombre" For="@(() => familyDto.Name)" />            
+            </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancelar</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Guardar</MudButton>
+        </DialogActions>
+    </MudDialog>
+</EditForm>
    
 @code {
-    private string input = string.Empty;
-    private string Id = string.Empty;
-
-    [Parameter] public DAL.DAO.Family  server { get; set; } = new DAL.DAO.Family();
-
-
-
+    public DAL.DAO.Family family = new DAL.DAO.Family();
+    [Parameter] public FamilyDto familyDto { get; set; } = new FamilyDto();
+    bool success;
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
-
-    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
 
-    private async Task Save()
-    {
-        if (server.Id != 0)
+    private async Task Save(EditContext context)
+    {       
+        if (familyDto.Id != 0)
         {
+            family = await _familyService.GetByIdAsync(familyDto.Id);
+            family.Name = familyDto.Name;
             await base.OnInitializedAsync();
-            Console.WriteLine(server.Id);
-            Console.WriteLine(server.Name);
-            var response = _GenericRespository.Update(server);
+            var response = _familyService.Update(family);
             if (response)
             {
                 Snackbar.Add("Se guardo correctamente", Severity.Success);
@@ -52,8 +49,9 @@
         }
         else 
         {
+            family.Name = familyDto.Name;
             await base.OnInitializedAsync();
-            var response = _GenericRespository.Insert(server);
+            var response = _familyService.Insert(family);
             if (response)
             {
                 Snackbar.Add("Se guardo correctamente", Severity.Success);

@@ -7,11 +7,14 @@ using DAL.DAO;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Monitor = DAL.DAO.Monitor;
-using DAL.Util;
+//using DAL.Util;
 using BackOfficeMonitorCocina.Extensiones;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
+using BackOfficeMonitorCocina.Interfaces;
+using BackOfficeMonitorCocina.Util;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -30,7 +33,7 @@ builder.Services.AddScoped<IGenericRepository<Article>, ArticleService>();
 builder.Services.AddScoped<IGenericRepository<Monitor>, MonitorService>();
 builder.Services.AddScoped<IGenericRepository<State>, StateService>();
 builder.Services.AddScoped<IGenericRepository<User>, UserService>();
-builder.Services.AddScoped<IPasswordHasher,PasswordHasher>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<MonitorService>();
 builder.Services.AddScoped<StateService>();
 builder.Services.AddScoped<UserService>();

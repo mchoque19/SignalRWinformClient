@@ -1,4 +1,5 @@
-﻿using Blazored.SessionStorage;
+﻿using BackOfficeMonitorCocina.DTO;
+using Blazored.SessionStorage;
 using DAL.DTO;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
@@ -41,7 +42,7 @@ namespace BackOfficeMonitorCocina.Extensiones
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 
         {
-            var sesionUsuario = await _sessionStoarge.ObtenerStorage<DAL.DTO.SessionDto>("sesionUsuario");
+            var sesionUsuario = await _sessionStoarge.ObtenerStorage<SessionDto>("sesionUsuario");
 
             if (sesionUsuario == null)
                 return await Task.FromResult(new AuthenticationState(_sinIformacion));

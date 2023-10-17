@@ -15,7 +15,14 @@ namespace DAL.Services
 
         public bool Delete(Family family)
         {
-            _context.Remove(family);
+            try
+            {
+                _context.Remove(family);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error al borrar familia");
+            }             
             return Save();
         }
 
@@ -24,15 +31,15 @@ namespace DAL.Services
             return await _context.Family.ToListAsync(); 
         }
 
-        public List<Family> GetAllFamily()
-        {
-            return  _context.Family.ToList();
+        //public List<Family> GetAllFamily()
+        //{
+        //    return  _context.Family.ToList();
 
-        }
+        //}
 
         public async Task<Family> GetByIdAsync(int id)
         {
-            return await _context.Family.FirstOrDefaultAsync(i => i.Id == id);
+            return await _context.Family.FirstAsync(i => i.Id == id);
              
         }
 
