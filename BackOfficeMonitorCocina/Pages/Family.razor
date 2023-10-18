@@ -28,8 +28,7 @@
                 <MudTd DataLabel="Id">@context.Id</MudTd>
                 <MudTd DataLabel="Name">@context.Name</MudTd>
                 <MudTd><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="edit" @onclick="@((e) => EditFamily(@context))" /></MudTd>
-                <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" @onclick="@((e) => DeleteFamily(@context))" /></MudTd>
-
+                @* <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" @onclick="@((e) => DeleteFamily(@context))" /></MudTd> *@
             }
         </RowTemplate>
         <PagerContent>
@@ -86,18 +85,18 @@
         }
     }
 
-    private async Task DeleteFamily(DAL.DAO.Family family)
-    {
-        var response = _familyService.Delete(family);
-        if (response)
-        {
-            Console.WriteLine("exito");
-            listFamily = await _familyService.GetAll();
-            StateHasChanged();
-        }
-        else
-        {
-            Console.WriteLine("bad");
-        }
-    }
+    // private async Task DeleteFamily(DAL.DAO.Family family)
+    // {
+    //     var response = _familyService.Delete(family);
+    //     if (response)
+    //     {
+    //         Console.WriteLine("exito");
+    //         listFamily = await _familyService.GetAll();
+    //         StateHasChanged();
+    //     }
+    //     else
+    //     {
+    //         Console.WriteLine("bad");
+    //     }
+    // }
 }

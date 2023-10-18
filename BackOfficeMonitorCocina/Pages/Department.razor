@@ -7,14 +7,7 @@
 @using BackOfficeMonitorCocina.Pages
 @inject NavigationManager NavigationManager
 
-@page "/department"
-@* <h3>Department</h3>
-<div class="row">
-    <div class="col-12 text-aling-right">
-        <a href="departmentNew">Nuevo</a>
-    </div>
-</div> *@
-
+@page "/department" 
     <MudTable Items="@departmentList" Dense="true" Hover="true" Bordered="false" Striped="true" Filter="new Func<DAL.DAO.Department,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
         <ToolBarContent>
             <MudText Typo="Typo.h4">Departamento</MudText>
@@ -51,12 +44,8 @@
     private string searchString1 = "";
     private DAL.DAO.Department selectedItem1 = null;
     private HashSet<DAL.DAO.Department> selectedItems = new HashSet<DAL.DAO.Department>();
-
     private IEnumerable<DAL.DAO.Department> Elements = new List<DAL.DAO.Department>();
-
-
     private bool FilterFunc1(DAL.DAO.Department element) => FilterFunc(element, searchString1);
-
     private bool FilterFunc(DAL.DAO.Department element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))

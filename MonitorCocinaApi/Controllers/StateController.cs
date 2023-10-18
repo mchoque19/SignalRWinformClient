@@ -1,38 +1,34 @@
 ﻿using DAL;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MonitorCocinaApi.Models;
-using MonitorCocinaApi.Models.response;
 using MonitorCocinaApi.DTO;
 
 namespace MonitorCocinaApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MonitorController : ControllerBase
+    public class StateController : ControllerBase
     {
         private readonly KitchenServerDbContext _context;
 
-        public MonitorController(KitchenServerDbContext context)
+        public StateController(KitchenServerDbContext context)
         {
             _context = context;
         }
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MonitorDto>>> GetTodoItems()
+        public async Task<ActionResult<IEnumerable<StatesDto>>> GetStates()
         {
-            var todoItem = _context.Monitor.Select(m => new MonitorDto()
+            var todoItem = _context.State.Select(m => new StatesDto()
             {
                 Id = m.Id,
                 Name = m.Name,
-                states = (List<StateDto>)m.States.Select(s => new StateDto()
-               {
-                   Id = s.Id 
-               })
+                Color = m.Color,
+                Order = m.Order
 
             }).ToListAsync();
-
             if (todoItem == null)
             {
                 return NotFound();
@@ -40,6 +36,5 @@ namespace MonitorCocinaApi.Controllers
 
             return await todoItem;
         }
-    
     }
 }
