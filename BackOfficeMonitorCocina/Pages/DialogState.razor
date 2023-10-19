@@ -1,18 +1,28 @@
-﻿@using MudBlazor;
+﻿@using BackOfficeMonitorCocina.Validator;
+@using MudBlazor;
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.State> _stateService
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="@state.Name" Label="Nombre" />
-        <MudNumericField @bind-Value="state.Order" Label="Orden" Variant="Variant.Text" Min="0"/>
-        <MudColorPicker @bind-Text="state.Color" Label="Color" ColorPickerView="ColorPickerView.Spectrum" />
-        <MudSwitch @bind-Checked="@state.Marchando" Label="Marchando" Color="Color.Primary" />
+       <MudForm Model="@state" @ref="@form" Validation="@(stateValidator.ValidateValue)" ValidationDelay="0">
+            <MudTextField @bind-Value="@state.Name" Label="Nombre" 
+                          For="@(() => state.Name)"
+                          Immediate="true" />
+            <MudNumericField @bind-Value="state.Order" Label="Orden" For="@(() => state.Order)"
+                             Immediate="true" />
+            
+            <MudTextField @bind-Text="state.Color" Label="Color" InputType="InputType.Color" For="@(() => state.Color)" />
+           
+            <MudSwitch @bind-Checked="@state.Marchando" Label="Marchando" Color="Color.Primary"
+                       For="@(() => state.Marchando)" />
+
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await Submit())">Guardar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -20,49 +30,51 @@
 
 @code {
 
+    MudForm form;
+    StateValidator stateValidator = new StateValidator();
+
     [Parameter] public DAL.DAO.State state { get; set; } = new DAL.DAO.State();
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
 
     void Cancel() => MudDialog.Cancel();
+ 
+    private async Task Submit()
+    {
+        await form.Validate();
 
-    private async Task Save()
-    { 
-        if (state.Id != 0)
+        if (form.IsValid)
         {
-            await base.OnInitializedAsync();
-            var response = _stateService.Update(state);
-            if (response)
+            if (state.Id != 0)
             {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
+
+                var response = _stateService.Update(state);
+                snackBarReponse(response);
             }
             else
             {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
+                var response = _stateService.Insert(state);
+                snackBarReponse(response);
             }
 
+        }
+    }
+     
+    public void snackBarReponse(bool response)
+    {
+        if (response)
+        {
+            Snackbar.Add("Se guardo correctamente", Severity.Success);
+            Console.WriteLine("exito");
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            await base.OnInitializedAsync();
-            var response = _stateService.Insert(state);
-            if (response)
-            {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
-            }
+            Snackbar.Add("Error al guardar", Severity.Error);
+            Console.WriteLine("bad");
+            MudDialog.Close(DialogResult.Cancel());
         }
     }
+      
 }

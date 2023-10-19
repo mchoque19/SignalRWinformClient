@@ -1,6 +1,7 @@
 ﻿@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _DepartmentService
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _FamilyService
 
+@using BackOfficeMonitorCocina.DTO;
 @using Microsoft.AspNetCore.Components.Authorization;
 @attribute [Authorize]
 @inject IDialogService DialogService
@@ -38,8 +39,6 @@
 @code {
     private IEnumerable<DAL.DAO.Department> departmentList = Array.Empty<DAL.DAO.Department>();
     public IEnumerable<DAL.DAO.Family> familyList = Array.Empty<DAL.DAO.Family>();
-
-    //Filtro de la tabla
     
     private string searchString1 = "";
     private DAL.DAO.Department selectedItem1 = null;
@@ -58,15 +57,10 @@
             return true;
         return false;
     }
-
-    //fin
-    //Crear
-
+    
     private async void EditDepartment(DAL.DAO.Department department)
     {
-        // se le pasa el departamento para mostrar en la parte de edicion 
-        //tambien se le pasa la id de la familia 
-        Console.WriteLine("Editar departamento");
+    
         var parameters = new DialogParameters();
         parameters.Add("familyList", familyList);
         parameters.Add("department", department);
@@ -80,7 +74,6 @@
             StateHasChanged();
         }
     }
-
     private async Task saveDepartment()
     {
         var parameters = new DialogParameters();      
@@ -93,11 +86,9 @@
             StateHasChanged();
         }
     }
-    //CAMBIOS GUARDADOS
-   
+    
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         departmentList = await _DepartmentService.GetAll();
         familyList = await _FamilyService.GetAll();
     }

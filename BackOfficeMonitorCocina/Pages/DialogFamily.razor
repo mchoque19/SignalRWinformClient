@@ -5,66 +5,65 @@
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
 
-<EditForm Model="@familyDto" OnValidSubmit="Save">
-<DataAnnotationsValidator/>
-    <MudDialog>
-        <DialogContent>
-            <MudTextField @bind-Value="@familyDto.Name" Label="Nombre" For="@(() => familyDto.Name)" />            
-            </DialogContent>
-        <DialogActions>
-            <MudButton OnClick="Cancel">Cancelar</MudButton>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Guardar</MudButton>
-        </DialogActions>
-    </MudDialog>
-</EditForm>
-   
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="@family" @ref="@form" Validation="@(familyValidator.ValidateValue)" ValidationDelay="0">
+            <MudTextField @bind-Value="family.Name"
+                          For="@(() => family.Name)"
+                          Immediate="true"
+                          Label="Nombre" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancelar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await Submit())">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code {
-    public DAL.DAO.Family family = new DAL.DAO.Family();
-    [Parameter] public FamilyDto familyDto { get; set; } = new FamilyDto();
-    bool success;
+
+    MudForm form;
+    FamilyValidator familyValidator = new FamilyValidator();
+
+    [Parameter] 
+    public DAL.DAO.Family family { get; set; }  = new DAL.DAO.Family();
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
     void Cancel() => MudDialog.Cancel();
 
-    private async Task Save(EditContext context)
-    {       
-        if (familyDto.Id != 0)
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
         {
-            family = await _familyService.GetByIdAsync(familyDto.Id);
-            family.Name = familyDto.Name;
-            await base.OnInitializedAsync();
-            var response = _familyService.Update(family);
-            if (response)
+            if (family.Id != 0)
             {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
+                var response = _familyService.Update(family);
+                snackBarReponse(response);
             }
             else
             {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
+                var response = _familyService.Insert(family);
+                snackBarReponse(response);
             }
+
         }
-        else 
+    }
+     
+    public void snackBarReponse(bool response)
+    {
+        if (response)
         {
-            family.Name = familyDto.Name;
-            await base.OnInitializedAsync();
-            var response = _familyService.Insert(family);
-            if (response)
-            {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
-            }
+            Snackbar.Add("Se guardo correctamente", Severity.Success);
+            Console.WriteLine("exito");
+            MudDialog.Close(DialogResult.Ok(true));
         }
-       
+        else
+        {
+            Snackbar.Add("Error al guardar", Severity.Error);
+            Console.WriteLine("bad");
+            MudDialog.Close(DialogResult.Cancel());
+        }
     }
 }

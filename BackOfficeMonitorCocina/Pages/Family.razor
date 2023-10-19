@@ -65,7 +65,7 @@
     private async void EditFamily(DAL.DAO.Family family)
     {       
         var dialogParameters = new DialogParameters();
-        dialogParameters.Add("familyDto", new FamilyDto(family.Id, family.Name));
+        dialogParameters.Add("family", family  );
         var dialog = DialogService.Show<Pages.DialogFamily>($"Editar {family.Name}", dialogParameters);
         var result = await dialog.Result;
         if (!result.Canceled)

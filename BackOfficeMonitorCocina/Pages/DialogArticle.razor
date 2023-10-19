@@ -1,4 +1,5 @@
-﻿@using MudBlazor;
+﻿@using BackOfficeMonitorCocina.Validator;
+@using MudBlazor;
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _departmentService
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Article> _articleService
 @inject NavigationManager NavigationManager
@@ -6,24 +7,32 @@
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="@article.Name" Label="Nombre" />
-        <MudSelect T="int" Label="Familia" AnchorOrigin="Origin.BottomCenter" @bind-Value="idDepartment" ReadOnly="@readAction">
-            @foreach (var item in departmentList)
-            {
-                <MudSelectItem Value="@item.Id">@item.Name</MudSelectItem>
-            }
-        </MudSelect>
+        <MudForm Model="@article" @ref="@form" Validation="@(articleValidator.ValidateValue)" ValidationDelay="0">
+
+            <MudTextField @bind-Value="@article.Name" Label="Nombre" 
+            For="@(() => article.Name)"
+                          Immediate="true" />
+       
+            <MudSelect @bind-Value="article.Department" Label="Departamento" For="@(() => article.Department)">
+                @foreach (var item in departmentList)
+                {
+                    <MudSelectItem Value="@item">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await Submit())">Guardar</MudButton>
     </DialogActions>
 </MudDialog>
 
 
 
 @code {
-    //obtener informacion del articulo
+    MudForm form;
+    ArticleValidator articleValidator = new ArticleValidator();
+
     //para editar
     [Parameter] public DAL.DAO.Article article { get; set; } = new DAL.DAO.Article();
     //obtener la id de la familia por parametro
@@ -39,49 +48,40 @@
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
 
-    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
 
-    private async Task Save()
+    private async Task Submit()
     {
-        if (article.Id != 0)
+        await form.Validate();
+
+        if (form.IsValid)
         {
-            Console.WriteLine("update");
-            department = await _departmentService.GetByIdAsync(idDepartment);
-            article.Department = department;
-            var response = _articleService.Update(article);
-            if (response)
-            {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
+            if (article.Id != 0)
+            {               
+                var response = _articleService.Update(article);
+                snackBarReponse(response);
             }
             else
             {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
+                var response = _articleService.Insert(article);
+                snackBarReponse(response);
             }
+        }
+    }
+     
+    public void snackBarReponse(bool response)
+    {
+        if (response)
+        {
+            Snackbar.Add("Se guardo correctamente", Severity.Success);
+            Console.WriteLine("exito");
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            Console.WriteLine("save");
-            department = await _departmentService.GetByIdAsync(idDepartment);
-            article.Department = department;
-            var response = _articleService.Insert(article);           
-            if (response)
-            {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
-            }
+            Snackbar.Add("Error al guardar", Severity.Error);
+            Console.WriteLine("bad");
+            MudDialog.Close(DialogResult.Cancel());
         }
-
     }
 }

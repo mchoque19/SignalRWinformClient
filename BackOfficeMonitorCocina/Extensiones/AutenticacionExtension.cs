@@ -1,6 +1,7 @@
 ﻿using BackOfficeMonitorCocina.DTO;
 using Blazored.SessionStorage;
 using DAL.DTO;
+using DAL.Util;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
@@ -16,7 +17,7 @@ namespace BackOfficeMonitorCocina.Extensiones
         }
 
         //guardar informacion 
-        public async Task ActualizarEstadoAutenticacion(SessionDto? sesionUsuario)
+        public async Task ActualizarEstadoAutenticacion(Session? sesionUsuario)
         {
             ClaimsPrincipal claimsPrincipal;
             
@@ -42,7 +43,7 @@ namespace BackOfficeMonitorCocina.Extensiones
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
 
         {
-            var sesionUsuario = await _sessionStoarge.ObtenerStorage<SessionDto>("sesionUsuario");
+            var sesionUsuario = await _sessionStoarge.ObtenerStorage<Session>("sesionUsuario");
 
             if (sesionUsuario == null)
                 return await Task.FromResult(new AuthenticationState(_sinIformacion));

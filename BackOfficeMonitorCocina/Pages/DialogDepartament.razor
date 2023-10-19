@@ -1,117 +1,73 @@
 ﻿@using MudBlazor;
 @using BackOfficeMonitorCocina.DTO;
-
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _FamilyService
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _DepartmentService
-
 @inject NavigationManager NavigationManager
 @inject ISnackbar Snackbar
- 
-<EditForm Model="@departmentDto" OnValidSubmit="Save">
-<DataAnnotationsValidator/>
 <MudDialog>
     <DialogContent>
-            <MudTextField @bind-Value="@departmentDto.Name" Label="Nombre" For="@(() => departmentDto.Name)"></MudTextField>
-            
-            
-            <MudSelect @bind-Value="stringValue" Label="Familia" HelperText="String" Placeholder="Please Select"
-                       AdornmentIcon="@Icons.Material.Filled.Fastfood" AdornmentColor="Color.Primary" For="@(() => departmentDto.prueba)">
-                @* <MudSelectItem Value=0 Disabled="true">Selecciona una familia</MudSelectItem> *@
-                <MudSelectItem Value="@(new FamilyDto() { Id=1, Name="pizza"})">Pizza</MudSelectItem>
-                <MudSelectItem Value="@(new FamilyDto() { Id=2, Name="Bebidas"})">Bebidas</MudSelectItem>
- 
-            </MudSelect>
+        <MudForm Model="@department" @ref="@form" Validation="@(departmentValidator.ValidateValue)" ValidationDelay="0">   
+       	    <MudTextField @bind-Value="department.Name"
+                          For="@(() => department.Name)"
+							      Immediate="true"
+							      Label="Nombre" />
 
-        </DialogContent>
+            <MudSelect @bind-Value="department.Family" Label="Familias" For="@(() => department.Family)">
+                @foreach (var item in familyList)
+                {
+                    <MudSelectItem Value="@item">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        @* <MudButton Color="Color.Primary" OnClick="Save">Guardar</MudButton> *@
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Guardar</MudButton>
-
+        <MudButton Variant="Variant.Filled" Color="Color.Primary"  OnClick="@(async () => await Submit())">Guardar</MudButton>
     </DialogActions>
-    </MudDialog>
-</EditForm>
+</MudDialog>
 @code {
-    //prueba de validacion
-    [Parameter] public DepartmentDto departmentDto { get; set; } = new DepartmentDto();
-    private FamilyDto stringValue { get; set; } = new FamilyDto();
-    private IEnumerable<FamilyDto> options { get; set; } = new List<FamilyDto>();
+    MudForm form;
+    DepartmentValidator departmentValidator = new DepartmentValidator();
 
-    
-
-
-    //[Parameter]
-    //public IEnumerable<DTO.FamilyDto> familyList { get; set; } = Array.Empty<FamilyDto>();
-    //fin prueba
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
-
     [Parameter] public DAL.DAO.Department department { get; set; } = new DAL.DAO.Department();
-    [Parameter]
-    public IEnumerable<DAL.DAO.Family> familyList { get; set; } = Array.Empty<DAL.DAO.Family>();
-    [Parameter] 
-    public int idFamily { get; set; }
+    [Parameter] public IEnumerable<DAL.DAO.Family> familyList { get; set; } = Array.Empty<DAL.DAO.Family>();
+    [Parameter] public int idFamily { get; set; }
 
-    //Familia pasar guardar
-    public DAL.DAO.Family family { get; set; } = new DAL.DAO.Family();
-
-
-
-    //me falta obtener la id de la familia del departamento para la parte de edicion 
-    //se debe de poner if el se al guardar o edidat 
     void Cancel() => MudDialog.Cancel();
-
-
-    private async Task Save(EditContext context)
+    private async Task Submit()
     {
-        Console.WriteLine("##############");
-        Console.WriteLine(department.Id);
-        Console.WriteLine(department.Id);
-        //Console.WriteLine(IdFamily);
+        await form.Validate();
 
-        // if(department.Id != 0)
-        // {
-        //     //actualizar 
-        //     family = await _FamilyService.GetByIdAsync(idFamily);
-        //     department.Family = family;
-        //     var response = _DepartmentService.Update(department);
-        //     if (response)
-        //     {
-        //         Snackbar.Add("Se guardo correctamente", Severity.Success);
-        //         Console.WriteLine("exito");
-        //         MudDialog.Close(DialogResult.Ok(true));
-        //     }
-        //     else
-        //     {
-        //         Snackbar.Add("Error al guardar", Severity.Error);
-        //         Console.WriteLine("bad");
-        //         MudDialog.Close(DialogResult.Cancel());
-        //     }
-        // }
-        // else
-        // {
-        //     //GUARDAR
-        //     family = await _FamilyService.GetByIdAsync(idFamily);
-        //     department.Family = family;
-        //     var response = _DepartmentService.Insert(department);
-        //     if (response)
-        //     {
-        //         Snackbar.Add("Se guardo correctamente", Severity.Success);
-        //         Console.WriteLine("exito");
-        //         MudDialog.Close(DialogResult.Ok(true));
-        //     }
-        //     else
-        //     {
-        //         Snackbar.Add("Error al guardar", Severity.Error);
-        //         Console.WriteLine("bad");
-        //         MudDialog.Close(DialogResult.Cancel());
-        //     }
-        // }
- 
+        if (form.IsValid)
+        {
+            if (department.Id != 0)
+            {      
+                var response = _DepartmentService.Update(department);
+                snackBarReponse(response);
+            }
+            else
+            {                
+                var response = _DepartmentService.Insert(department);
+                snackBarReponse(response);
+            }
 
-     
-
-
+        }
     }
-
+    public void snackBarReponse(bool response)
+    {         
+            if (response)
+            {
+                Snackbar.Add("Se guardo correctamente", Severity.Success);
+                Console.WriteLine("exito");
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+            {
+                Snackbar.Add("Error al guardar", Severity.Error);
+                Console.WriteLine("bad");
+                MudDialog.Close(DialogResult.Cancel());
+            }                
+    }          
 }

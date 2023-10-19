@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DataAccess\DAL.cspro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOfficeMonitorCocina", "BackOfficeMonitorCocina\BackOfficeMonitorCocina.csproj", "{409BD593-2BB2-4F9D-A483-2618A0463B60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonitorCocinaApi", "MonitorCocinaApi\MonitorCocinaApi.csproj", "{B9FDB3FA-9B04-4707-99CB-2DEC3DE2EBE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonitorCocinaApi", "MonitorCocinaApi\MonitorCocinaApi.csproj", "{B9FDB3FA-9B04-4707-99CB-2DEC3DE2EBE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

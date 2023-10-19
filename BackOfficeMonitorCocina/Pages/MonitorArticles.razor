@@ -15,9 +15,13 @@
         <MudSelect Placeholder="Selecciona una familia" T="DAL.DAO.Family" 
         Label="Familia"   Required="true" AdornmentIcon="@Icons.Material.Filled.Search"
                    AdornmentColor="Color.Primary" ValueChanged="valueChangedSelectFamily">
-            @foreach (var family in familyList)
+            @if (familyList.Any())
             {
-                <MudSelectItem Value="@family">@family.Name</MudSelectItem>
+                @foreach (var family in familyList)
+                {
+                    <MudSelectItem Value="@family">@family.Name</MudSelectItem>
+                }
+
             }
         </MudSelect>
     </MudItem>

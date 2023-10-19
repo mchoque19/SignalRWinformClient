@@ -1,16 +1,19 @@
 ﻿@page "/"
  
 @* @using BackOfficeMonitorCocina.Services; *@
-@using BackOfficeMonitorCocina.Shared;
+@* @using BackOfficeMonitorCocina.Shared;
 @using BackOfficeMonitorCocina.DTO;
+  *@
  
-
 @layout LoginLayout
 @using BackOfficeMonitorCocina.Extensiones
+@using BackOfficeMonitorCocina.Validator;
 @using DAL.Services;
 @using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider autenticationProvide
-@inject UserService userService
+@* @inject servicioUSERprueba userService *@
+
+@inject DAL.Services.UserService userService
 
 @inject NavigationManager NavigationManager
 @using System.Text.RegularExpressions
@@ -18,44 +21,71 @@
 @inject ISnackbar Snackbar
 
 <MudContainer Class="mt-16" MaxWidth="MaxWidth.Medium">       
-    <EditForm Model="@user" OnValidSubmit="LoginSubmit">
-    <DataAnnotationsValidator />
+   
         <MudGrid Justify="Justify.Center" Spacing="6" Class="mt-16">
         <MudItem xs="12" sm="7">
                 <MudCard  Class="mt-16">
                 <MudText Typo="Typo.h4" Align="Align.Center">Login</MudText>
                 <MudCardContent>
+                    <MudForm Model="@user" @ref="@form" Validation="@(loginValidator.ValidateValue)" ValidationDelay="0">
+
                         <MudTextField Label="Usuario" 
                         @bind-Value="user.Username" For="@(() => user.Username)" />
                         <MudTextField Label="Contraseña" Class="mt-3"
                     @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
+                    </MudForm>
                 </MudCardContent>
                 <div class="d-flex align-center justify-center">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mb-3">Iniciar sesión</MudButton>
+                    @* <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mb-3">Iniciar sesión</MudButton> *@
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await Submit())">Iniciar sesión</MudButton>
+
+
                 </div>
             </MudCard>
         </MudItem>
     </MudGrid>
-</EditForm> 
 </MudContainer>              
 @code {
-    bool success; 
+    MudForm form;
+    LoginValidator loginValidator = new LoginValidator();
+
     DAL.DAO.User user = new DAL.DAO.User();
-    SessionDto sesionUser = new SessionDto();
-    private async Task LoginSubmit(EditContext context)
+    DAL.Util.Session sesionUser = new DAL.Util.Session();
+    // private async Task LoginSubmit(EditContext context)
+    // {
+            
+    //     try
+    //     {
+    //         sesionUser = await userService.Login(user);
+    //         var autenticacionExt = (AutenticacionExtension)autenticationProvide;
+    //         await autenticacionExt.ActualizarEstadoAutenticacion(sesionUser);
+    //         NavigationManager.NavigateTo("/index");
+    //     }
+    //     catch
+    //     {
+    //         Snackbar.Add("Usuario o contraseña incorrectos", Severity.Error);
+    //     }              
+    // }
+     
+
+    private async Task Submit()
     {
-        success = true;      
-        try
-        {
-            sesionUser = await userService.Login(user);
-            var autenticacionExt = (AutenticacionExtension)autenticationProvide;
-            await autenticacionExt.ActualizarEstadoAutenticacion(sesionUser);
-            NavigationManager.NavigateTo("/index");
+        await form.Validate();
+
+        if (form.IsValid)
+        {            
+            try
+            {
+                sesionUser = await userService.Login(user);
+                var autenticacionExt = (AutenticacionExtension)autenticationProvide;
+                await autenticacionExt.ActualizarEstadoAutenticacion(sesionUser);
+                NavigationManager.NavigateTo("/index");
+            }
+            catch
+            {
+                Snackbar.Add("Usuario o contraseña incorrectos", Severity.Error);
+            }
         }
-        catch
-        {
-            Snackbar.Add("Usuario o contraseña incorrectos", Severity.Error);
-        }              
     }
 }
     

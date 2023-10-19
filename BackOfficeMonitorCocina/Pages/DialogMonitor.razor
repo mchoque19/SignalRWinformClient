@@ -1,70 +1,71 @@
 ﻿@page "/pagenew"
+@using BackOfficeMonitorCocina.Validator;
 @inject DAL.Interfaces.IGenericRepository<DAL.DAO.Monitor> _monitorService
 @inject ISnackbar Snackbar
 
 <MudDialog>
     <DialogContent>
-        <MudTextField @bind-Value="@monitor.Name" Label="Nombre" />
+        <MudForm Model="@monitor" @ref="@form" Validation="@(monitorValidator.ValidateValue)" ValidationDelay="0">
+            <MudTextField @bind-Value="monitor.Name"
+                          For="@(() => monitor.Name)"
+                          Immediate="true"
+                          Label="Nombre" />
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancelar</MudButton>
-        <MudButton Color="Color.Primary" OnClick="save">Guardar</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(async () => await Submit())">Guardar</MudButton>
     </DialogActions>
 </MudDialog>
 
 
 
 @code {
-    private string input = string.Empty;
-    private string Id = string.Empty;
+ 
+    MudForm form;
+    MonitorValidator monitorValidator = new MonitorValidator();
+
 
     [Parameter] public DAL.DAO.Monitor monitor { get; set; } = new DAL.DAO.Monitor();
-
-
 
     [CascadingParameter]
     private MudDialogInstance MudDialog { get; set; } = default!;
 
-    //void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
 
-    private async Task save()
+    private async Task Submit()
     {
-        if (monitor.Id != 0)
+        await form.Validate();
+
+        if (form.IsValid)
         {
-            await base.OnInitializedAsync();
-            var response = _monitorService.Update(monitor);
-            if (response)
+            if (monitor.Id != 0)
             {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));             
+                var response = _monitorService.Update(monitor);
+                snackBarReponse(response);
             }
             else
             {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
+                var response = _monitorService.Insert(monitor);
+                snackBarReponse(response);
             }
+        }
+    }
+
+    public void snackBarReponse(bool response)
+    {
+        if (response)
+        {
+            Snackbar.Add("Se guardo correctamente", Severity.Success);
+            Console.WriteLine("exito");
+            MudDialog.Close(DialogResult.Ok(true));
         }
         else
         {
-            await base.OnInitializedAsync();
-            var response = _monitorService.Insert(monitor);
-            if (response)
-            {
-                Snackbar.Add("Se guardo correctamente", Severity.Success);
-                Console.WriteLine("exito");
-                MudDialog.Close(DialogResult.Ok(true));
-            }
-            else
-            {
-                Snackbar.Add("Error al guardar", Severity.Error);
-                Console.WriteLine("bad");
-                MudDialog.Close(DialogResult.Cancel());
-            }
+            Snackbar.Add("Error al guardar", Severity.Error);
+            Console.WriteLine("bad");
+            MudDialog.Close(DialogResult.Cancel());
         }
-        
     }
       
 }
