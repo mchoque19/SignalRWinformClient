@@ -19,8 +19,8 @@ namespace DAL
         public DbSet<DAO.Monitor> Monitor { get; set; }
         public DbSet<Family> Family { get; set; }
         public DbSet<Department> Department { get; set; }
-
-        public DbSet<User> User { get; set; }
+		public DbSet<Device> Device { get; set; }
+		public DbSet<User> User { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<OrderItem>().ToTable("OrderItem").HasKey(o => new { o.OrderId,  o.OrderLineNo });

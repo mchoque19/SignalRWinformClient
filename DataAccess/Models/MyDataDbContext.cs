@@ -31,6 +31,7 @@ public partial class MyDataDbContext : DbContext
 
     public virtual DbSet<State> States { get; set; }
 
+    public virtual DbSet<Device> Device { get; set; }
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public string? Name { get; set; }
-        public List<StateDto>? states { get; set; }
+        public List<StateDto>? States { get; set; }
 
 
     }

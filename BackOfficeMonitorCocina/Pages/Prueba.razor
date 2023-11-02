@@ -1,0 +1,134 @@
+﻿@page "/prueba"
+ 
+@using System.Net.Http.Json
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _familyService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _departmanetService
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+@using System.Net.Http.Json
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
+@inject NavigationManager NavigationManager
+@using BackOfficeMonitorCocina.DTO;
+
+
+
+<style>
+    .mud-table-cell-custom-group {
+        font-weight: 500;
+    }
+
+    .mud-table-cell-custom-group-footer {
+        padding-bottom: 50px;
+        text-align: right;
+    }
+</style>
+
+<MudTable Hover="true" Breakpoint="Breakpoint.Sm"   FixedHeader="true"
+          Items="@Elements"
+          Virtualize="@_virtualize"
+          GroupBy="@_groupDefinition"
+          GroupHeaderStyle="background-color:var(--mud-palette-background-grey)"
+          GroupFooterClass="mb-4"
+          Dense="_dense"
+          MultiSelection="_multiSelect">
+    <ColGroup>
+        <col style="width: 60px;" />
+        <col />
+        <col />
+        <col />
+        <col />
+        <col />
+    </ColGroup>
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">Familias/Departamentos</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+
+        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" aria-label="edit" @onclick="@(AddFamilyDialog)" Variant="Variant.Filled" />
+
+    </ToolBarContent>
+                             
+    <HeaderContent>
+        <MudTh>ID</MudTh>
+        <MudTh>Departamentos</MudTh>
+    </HeaderContent>
+    <GroupHeaderTemplate>
+        <MudTh Class="mud-table-cell-custom-group" colspan="5"> @($"{context.GroupName}: {context.Key} ")</MudTh>   
+
+
+        </GroupHeaderTemplate>
+        <RowTemplate>      
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Name"><MudLink Href="@($"/department-article/{context.Id}")">@context.Name</MudLink></MudTd>
+         </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>   
+    </MudTable>
+
+ 
+    @code {
+
+    //prueba
+
+
+
+    //fin prueba
+
+    private bool _dense = true;
+    private bool _multiSelect = true;
+    private bool _virtualize = true;
+
+    private TableGroupDefinition<DAL.DAO.Department> _groupDefinition = new()
+        {
+            GroupName = "Familia",
+            Indentation = true,
+            Expandable = true,
+            Selector = (e) => e.Family.Name
+        };
+
+    private IEnumerable<DAL.DAO.Department> Elements = new List<DAL.DAO.Department>();
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = await _departmanetService.GetAll();
+    }
+
+
+
+    private async void AddFamilyDialog()
+    {
+        var dialogParameters = new DialogParameters();
+        var dialog = DialogService.Show<Pages.DialogFamily>("Nueva Familia", dialogParameters);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            //listFamily = await _familyService.GetAll();
+            Elements = await _departmanetService.GetAll();
+            StateHasChanged();
+        }
+    }
+
+      
+    //buscador
+    private string searchString1 = "";
+    private DAL.DAO.State selectedItem1 = null;
+    private HashSet<DAL.DAO.State> selectedItems = new HashSet<DAL.DAO.State>();
+
+    // private IEnumerable<DAL.DAO.State> Elements = new List<DAL.DAO.State>();
+
+    private bool FilterFunc1(DAL.DAO.State element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DAL.DAO.State element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if ($"{element.Id} {element.Name}".Contains(searchString))
+            return true;
+        return false;
+    }
+}

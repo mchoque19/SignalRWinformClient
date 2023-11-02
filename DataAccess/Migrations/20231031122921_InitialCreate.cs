@@ -6,11 +6,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Device",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Mac = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ip = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Version = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Active = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Device", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Family",
                 columns: table => new
@@ -329,6 +347,9 @@ namespace DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "DepartmentMonitor");
+
+            migrationBuilder.DropTable(
+                name: "Device");
 
             migrationBuilder.DropTable(
                 name: "FamilyMonitor");

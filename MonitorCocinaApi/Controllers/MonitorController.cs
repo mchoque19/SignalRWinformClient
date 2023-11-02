@@ -4,11 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using MonitorCocinaApi.Models;
 using MonitorCocinaApi.Models.response;
 using MonitorCocinaApi.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MonitorCocinaApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MonitorController : ControllerBase
     {
         private readonly KitchenServerDbContext _context;
@@ -22,24 +24,19 @@ namespace MonitorCocinaApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MonitorDto>>> GetTodoItems()
         {
-            var todoItem = _context.Monitor.Select(m => new MonitorDto()
+            var listMonitor = _context.Monitor.Select(m => new MonitorDto()
             {
                 Id = m.Id,
                 Name = m.Name,
-                states = (List<StateDto>)m.States.Select(s => new StateDto()
+                States = (List<StateDto>)m.States.Select(s => new StateDto()
                {
                    Id = s.Id 
                })
 
-            }).ToListAsync();
+            }).ToList();
+		 
+            return listMonitor.Count() > 0 ? Ok(listMonitor) : NotFound("No se encontraron monitores");         
+		}
 
-            if (todoItem == null)
-            {
-                return NotFound();
-            }
-
-            return await todoItem;
-        }
-    
-    }
+	}
 }

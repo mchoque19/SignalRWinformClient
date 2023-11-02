@@ -1,0 +1,104 @@
+﻿@page "/pruebados"
+
+@using System.Net.Http.Json
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Family> _familyService
+@inject DAL.Interfaces.IGenericRepository<DAL.DAO.Department> _departmanetService
+
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+@using System.Net.Http.Json
+@inject IDialogService DialogService
+@using BackOfficeMonitorCocina.Pages
+@inject NavigationManager NavigationManager
+@using BackOfficeMonitorCocina.DTO;
+
+
+
+<MudTable Items="@prueba" Hover="true" Breakpoint="Breakpoint.Sm">
+	<ColGroup>
+		<col style="width:100px;" />
+		<col style="width:100px;" />
+		<col />
+		<col style="width:100px;" />
+	</ColGroup>
+	<HeaderContent>
+		<MudTh></MudTh>
+		<MudTh>Id</MudTh>
+		<MudTh>Nombre</MudTh>
+	</HeaderContent>
+	<RowTemplate  >
+		<MudTd>		 
+			@if (context.Departments.Any()){
+			<MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Filled.KeyboardArrowDown"
+					   OnClick="@(() => ShowBtnPress(context.Id))"></MudButton>
+			}
+		</MudTd>					
+	    <MudTd DataLabel="Id">@context.Id</MudTd>
+		<MudTd DataLabel="Name">@context.Name</MudTd>
+	</RowTemplate>
+	<ChildRowContent>
+
+		@if (context.ShowDetails)
+		{
+			<MudTr style="width:300px;">
+				<td colspan="4">
+					<MudCard Elevation="0">
+						<MudCardHeader>
+							<CardHeaderContent>
+								<MudText Typo="Typo.body1">Familia : <strong>@context.Name</strong></MudText>
+							</CardHeaderContent>
+						</MudCardHeader>
+						<MudCardContent Class="pa-0">
+							<MudTable Items="@context.Departments" Context="AddressContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+								<ColGroup>
+									<col style="width:300px; background-color:red" />
+									<col style="width:300px;" />
+									<col style="width:300px;" />
+								</ColGroup>
+								<HeaderContent>
+									<MudTh>Id</MudTh>
+									<MudTh>Name</MudTh>
+								</HeaderContent>
+								<RowTemplate>
+									<MudTd DataLabel="Id">@AddressContext.Id</MudTd>
+									<MudTd DataLabel="Name">@AddressContext.Name</MudTd>
+								</RowTemplate>
+							</MudTable>
+						</MudCardContent>
+					</MudCard>
+				</td>
+			</MudTr>
+		}
+	</ChildRowContent>
+</MudTable>
+
+@code
+{
+	//prueba
+	private bool HideLabel { get; set; } = false;
+
+	private IEnumerable<DAL.DAO.Family> listFamily = Array.Empty<DAL.DAO.Family>();
+
+	private List<DTO.FamilyDto> prueba = new  List<DTO.FamilyDto>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		listFamily = await _familyService.GetAll(); 
+		foreach(var i in listFamily)
+		{
+			var r = new DTO.FamilyDto();
+			r.Id = i.Id;
+			r.Name = i.Name;
+			r.Departments = i.Departments;
+			prueba.Add(r);
+			
+		}
+	}
+ 
+	private void ShowBtnPress(int nr)
+	{
+		DTO.FamilyDto tmpPerson = prueba.First(f => f.Id == nr);
+		tmpPerson.ShowDetails = !tmpPerson.ShowDetails;		 
+	}    
+}
