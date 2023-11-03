@@ -1,14 +1,14 @@
-﻿namespace MonitorCocinaApi.Models.response
+﻿namespace MonitorCocinaApi.DTO
 {
-    public class Response
+    public class ResponseDto
     {
         public int Success { get; set; }
         public string Message { get; set; }
         public object Data { get; set; }
 
-        public Response()
+        public ResponseDto()
         {
-            this.Success = 0;
+            Success = 0;
         }
     }
 }

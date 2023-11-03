@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MonitorCocinaApi.DTO;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MonitorCocinaApi.Controllers
 {
@@ -28,31 +30,68 @@ namespace MonitorCocinaApi.Controllers
 		[HttpPost("login")]
 		public async Task<ActionResult<DeviceDto>> Login(DeviceDto request)
 		{
-	 		var todoItem = _context.Device.SingleOrDefault(d => d.Mac == request.Mac);
-			if (todoItem ==  null)  
+			ResponseLoginDto<string> response = new();
+ 
+			if (ValidateDevice(request))
 			{
-				Console.WriteLine("Guardar dispositivo");
-				var device = new Device()
+				var todoItem = _context.Device.SingleOrDefault(d => d.Mac == request.Mac);
+				if (todoItem == null)
 				{
-					Name = request.Name,
-					Mac = request.Mac,
-					Ip = request.Ip,
-					Version = request.Version,
-					Active = true,
-					Date = DateTime.Now
-				};
-				_context.Device.Add(device);
-				_context.SaveChanges();
-				return NotFound("Dispositivo no encontrado");
-			}
-
-			string token = CreateToken(request);
-			if (todoItem.Active)
-			{
-				return Ok(token);
-			}
-			return BadRequest("Dispositivo no Activado");		 
+					//Guardar dispositivo
+					var device = new Device()
+					{
+						Name = request.Name,
+						Mac = request.Mac,
+						Ip = request.Ip,
+						Version = request.Version,
+						Date = DateTime.Now
+					};
+					_context.Device.Add(device);
+					_context.SaveChanges();				 
+					response.Error = errorMessage(400, "Dispositivo no encontrado");
+					response.Result = -1;
+					return StatusCode(401, response);			
+				} 
+				 
+				if (todoItem.Active)
+				{
+					string token = CreateToken(request);
+					response.Content = token;
+					return Ok(response);
+				}
+				response.Error = errorMessage(401, "Dispositivo no activado");
+				response.Result = -1;
+				return StatusCode(401, response);
+				 		 			 
+			}		 
+			response.Error = errorMessage(400, "Credenciales incorrectas");
+			response.Result = -1;			
+			return StatusCode(400, response);
 		}
+
+		private ErrorDto errorMessage (int code, string message)
+		{
+			ErrorDto error = new ErrorDto();
+			error.Error_type = code;
+			error.Error_desc = message;
+			return error;
+		}
+
+		private bool ValidateDevice(DeviceDto? device)
+		{
+			if (device is null)
+				return false;
+			if (string.IsNullOrEmpty(device.Name))
+				return false;
+			if (string.IsNullOrEmpty(device.Mac))
+				return false;
+			if (string.IsNullOrEmpty(device.Ip))
+				return false;
+			if (string.IsNullOrEmpty(device.Version))
+				return false;
+			return true;
+		}
+
 		private string CreateToken(DeviceDto request)
 		{
 			List<Claim> claims = new()
@@ -73,5 +112,7 @@ namespace MonitorCocinaApi.Controllers
 			var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 			return jwt;
 		}
+	
+		
 	}
 }

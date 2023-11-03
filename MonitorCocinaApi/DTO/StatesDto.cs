@@ -1,4 +1,6 @@
-﻿namespace MonitorCocinaApi.DTO
+﻿using System.Drawing;
+
+namespace MonitorCocinaApi.DTO
 {
     public class StatesDto
     {

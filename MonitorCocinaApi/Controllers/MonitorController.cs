@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MonitorCocinaApi.Models;
-using MonitorCocinaApi.Models.response;
+ 
 using MonitorCocinaApi.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Azure.Core;
+using System.Collections.Generic;
 
 namespace MonitorCocinaApi.Controllers
 {
@@ -24,7 +26,10 @@ namespace MonitorCocinaApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MonitorDto>>> GetTodoItems()
         {
-            var listMonitor = _context.Monitor.Select(m => new MonitorDto()
+			 
+			ResponseLoginDto<object> response = new ResponseLoginDto<object>();
+
+			var listMonitor = _context.Monitor.Select(m => new MonitorDto()
             {
                 Id = m.Id,
                 Name = m.Name,
@@ -34,9 +39,26 @@ namespace MonitorCocinaApi.Controllers
                })
 
             }).ToList();
-		 
-            return listMonitor.Count() > 0 ? Ok(listMonitor) : NotFound("No se encontraron monitores");         
+
+            if(listMonitor.Count() > 0)
+            {			 
+				response.Content = listMonitor;
+				return Ok(response);
+			}
+
+			response.Error = errorMessage(400, "No se encontraron monitores");
+			response.Result = -1;
+			return StatusCode(400, response);			     
 		}
+
+		private ErrorDto errorMessage(int code, string message)
+		{
+			ErrorDto error = new ErrorDto();
+			error.Error_type = code;
+			error.Error_desc = message;
+			return error;
+		}
+
 
 	}
 }

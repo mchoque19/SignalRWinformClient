@@ -6,10 +6,12 @@ using System.Drawing.Text;
 using SignalRChat.DTO.Requests;
 using SignalRChat.DTO;
 using NuGet.Protocol;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SignalRChat.Hubs
 {
-    public class ChatHub: Hub
+	[Authorize]
+	public class ChatHub: Hub
     {
         private readonly KitchenOrderService _orderService;
         private readonly IService<PrintOrderGroup> _printOrderGroupService;
