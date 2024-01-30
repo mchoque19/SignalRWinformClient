@@ -15,10 +15,10 @@ namespace SignalRChat.Hubs
     {
         private readonly KitchenOrderService _orderService;
         private readonly IService<PrintOrderGroup> _printOrderGroupService;
-        private readonly IService<DAL.DAO.Article> _articleService;
+        private readonly ArticleService _articleService;
         private readonly OrderItemService _orderItemService;
 
-        public ChatHub(KitchenOrderService orderService, IService<PrintOrderGroup> printOrderGroupService, IService<DAL.DAO.Article> articleService, OrderItemService orderItemService)
+        public ChatHub(KitchenOrderService orderService, IService<PrintOrderGroup> printOrderGroupService, ArticleService articleService, OrderItemService orderItemService)
         {
             _orderService = orderService;
             _printOrderGroupService = printOrderGroupService;
@@ -28,7 +28,7 @@ namespace SignalRChat.Hubs
 
         public async Task KitchenOrder(DTO.Requests.KitchenOrder json)
         {
-            
+            Console.WriteLine(json);
             int OrderLineNo = 0;
             DTO.Responses.KitchenOrder response = new()
             {
@@ -148,8 +148,8 @@ namespace SignalRChat.Hubs
                     print.ArticleList.Add(resArticle);
                 }
                 response.PrintOrderList.Add(print);
-
             }
+            
             _orderService.save(response.ToDictionary());
             Console.WriteLine(response.ToString());
             

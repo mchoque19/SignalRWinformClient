@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRChat", "SignalRChat\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DataAccess\DAL.csproj", "{A2181C7C-7921-4A82-B86A-B469D4A4AE39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackOfficeMonitorCocina", "BackOfficeMonitorCocina\BackOfficeMonitorCocina.csproj", "{409BD593-2BB2-4F9D-A483-2618A0463B60}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonitorCocinaApi", "MonitorCocinaApi\MonitorCocinaApi.csproj", "{B9FDB3FA-9B04-4707-99CB-2DEC3DE2EBE1}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{A2181C7C-7921-4A82-B86A-B469D4A4AE39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2181C7C-7921-4A82-B86A-B469D4A4AE39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2181C7C-7921-4A82-B86A-B469D4A4AE39}.Release|Any CPU.Build.0 = Release|Any CPU
-		{409BD593-2BB2-4F9D-A483-2618A0463B60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{409BD593-2BB2-4F9D-A483-2618A0463B60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{409BD593-2BB2-4F9D-A483-2618A0463B60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{409BD593-2BB2-4F9D-A483-2618A0463B60}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9FDB3FA-9B04-4707-99CB-2DEC3DE2EBE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B9FDB3FA-9B04-4707-99CB-2DEC3DE2EBE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9FDB3FA-9B04-4707-99CB-2DEC3DE2EBE1}.Release|Any CPU.ActiveCfg = Release|Any CPU

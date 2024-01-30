@@ -20,9 +20,10 @@ builder.Services.AddDbContext<KitchenServerDbContext>(opts=> opts.UseLazyLoading
     //b => b.MigrationsAssembly("SignalRWinformClient.DAL")
     ));
 builder.Services.AddScoped<KitchenOrderService>();
+builder.Services.AddScoped<ArticleService>();
 builder.Services.AddScoped<OrderItemService>();
 
- 
+
 builder.Services.AddScoped<IService<PrintOrderGroup>, PrintOrderGroupService>();
 
 //inicio prueba
@@ -103,7 +104,6 @@ app.UseAuthorization();
 
 //app.MapRazorPages();
 app.MapHub<ChatHub>("/chathub");
-app.MapHub<ListasHub>("/listashub");
 
  
 
