@@ -90,12 +90,12 @@ namespace SignalRChat.Hubs
                     changeStatus.ChangeList.Add(change);
                 }
                 _orderItemService.ChangeStatus(changeStatus);
+                await Clients.All.SendAsync("ChangeStatus", changeStatus);
             }
             else
             {
 
             }
-            await Clients.All.SendAsync("ChangeStatus", changeStatus);
 
         }
 

@@ -7,7 +7,7 @@ namespace SignalRChat.DTO.Requests
     {
         public int Id { get; set; }
         public float Units { get; set; }
-        public List<string> ModifList { get; set; }
+        public List<string> ModifList { get; set; } = new List<string>();
         public Menu? Menu { get; set; }
 
         public override string ToString()

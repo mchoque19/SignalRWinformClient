@@ -2,7 +2,7 @@
 {
     public class PrintOrder
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public List<Article> ArticleList { get; set; }
 
         public override string ToString()

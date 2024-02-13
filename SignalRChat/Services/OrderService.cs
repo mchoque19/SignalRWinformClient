@@ -57,167 +57,169 @@ namespace SignalRChat.Services
             kitchenOrder.OrderId = dbOrder.Id;
             foreach (DTO.Requests.PrintOrder  printOrder in order.PrintOrderList)
             {
+                PrintOrderGroup? orderGroupDb = null;
+                DTO.Responses.PrintOrder po = new();
                 int OrderLineNo = 0;
-                PrintOrderGroup? orderGroupDb = _printOrderGroupRepo.GetById(printOrder.Id);
-                if (orderGroupDb != null)
+                if (printOrder.Id != null)
                 {
-                    DTO.Responses.PrintOrder po = new()
+                    orderGroupDb = _printOrderGroupRepo.GetById(printOrder.Id.Value);
+                    if (orderGroupDb != null)
                     {
-                        Id = orderGroupDb.Id,
-                        Name = orderGroupDb.Name
-                    };
-                    foreach (DTO.Requests.Article article in printOrder.ArticleList)
+                        po.Name = orderGroupDb.Name;
+                        po.Id = orderGroupDb.Id;
+                    }
+                }
+                
+                foreach (DTO.Requests.Article article in printOrder.ArticleList)
+                {
+                    OrderLineNo++;
+                    Article? artDb = _articleRepo.GetById(article.Id);
+                    if (artDb != null)
                     {
-                        OrderLineNo++;
-                        Article? artDb = _articleRepo.GetById(article.Id);
-                        if (artDb != null)
+                        DTO.Responses.Article a = new()
                         {
-                            DTO.Responses.Article a = new()
+                            Id = artDb.Id,
+                            OrderLineNo = OrderLineNo,
+                            Name = artDb.Name,
+                            Units = article.Units,
+                            ModifList = article.ModifList,
+                            PeparationTime = artDb.PreparationTime,
+                            StateId = _stateRepo.GetAll().OrderBy(state => state.Order).First().Id
+
+                        };
+
+                        OrderItem orderItem = new()
+                        {
+                            OrderId = dbOrder.Id,
+                            OrderLineNo = OrderLineNo,
+                            PrintOrderGroup = orderGroupDb,
+                            Units = article.Units,
+                            ModifList = String.Join(',', article.ModifList),
+                            Article = artDb,
+                            State = _stateRepo.GetAll().OrderBy(state => state.Order).First()
+
+
+                        };
+                        orderItem = _orderItemRepo.Save(orderItem);
+
+                        if (article.Menu == null)
+                        {
+                            if (artDb.Monitors.Count > 0)
                             {
-                                Id = artDb.Id,
-                                OrderLineNo = OrderLineNo,
-                                Name = artDb.Name,
-                                Units = article.Units,
-                                ModifList = article.ModifList,
-                                PeparationTime = artDb.PreparationTime,
-                                StateId = _stateRepo.GetAll().OrderBy(state => state.Order).First().Id
-
-                            };
-
-                            OrderItem orderItem = new()
-                            {
-                                OrderId = dbOrder.Id,
-                                OrderLineNo = OrderLineNo,
-                                PrintOrderGroup = orderGroupDb,
-                                Units = article.Units,
-                                ModifList = String.Join(',', article.ModifList),
-                                Article = artDb,
-                                State = _stateRepo.GetAll().OrderBy(state => state.Order).First()
-
-
-                            };
-                            orderItem = _orderItemRepo.Save(orderItem);
-
-                            if (article.Menu == null)
-                            {
-                                if (artDb.Monitors.Count > 0)
+                                foreach (DAL.Models.Monitor monitor in artDb.Monitors)
                                 {
-                                    foreach (DAL.Models.Monitor monitor in artDb.Monitors)
-                                    {
-                                        a.MonitorList.Add((uint) monitor.Id);
-                                    }
-                                }else if (artDb.Department.Monitors.Count > 0)
-                                {
-                                    foreach (DAL.Models.Monitor monitor in artDb.Department.Monitors)
-                                    {
-                                        a.MonitorList.Add((uint)monitor.Id);
-                                    }
+                                    a.MonitorList.Add((uint) monitor.Id);
                                 }
-                                else
+                            }else if (artDb.Department.Monitors.Count > 0)
+                            {
+                                foreach (DAL.Models.Monitor monitor in artDb.Department.Monitors)
                                 {
-                                    foreach (DAL.Models.Monitor monitor in artDb.Department.Family.Monitors)
-                                    {
-                                        a.MonitorList.Add((uint)monitor.Id);
-                                    }
+                                    a.MonitorList.Add((uint)monitor.Id);
                                 }
-                                
                             }
                             else
                             {
-                                a.Menu = new DTO.Responses.Menu()
+                                foreach (DAL.Models.Monitor monitor in artDb.Department.Family.Monitors)
                                 {
-                                    Name = a.Menu.Name
-                                };
+                                    a.MonitorList.Add((uint)monitor.Id);
+                                }
+                            }
                                 
-                                foreach (DTO.Requests.PrintOrder menuPrintOrder in article.Menu.printOrderList)
+                        }
+                        else
+                        {
+                            a.Menu = new DTO.Responses.Menu()
+                            {
+                                Name = article.Menu.Name
+                            };
+                                
+                            foreach (DTO.Requests.PrintOrder menuPrintOrder in article.Menu.printOrderList)
+                            {
+                                PrintOrderGroup? menuOrderGroupDb = null;
+                                DTO.Responses.PrintOrder menuPO = new();
+                                if (menuPrintOrder.Id != null)
                                 {
-                                    PrintOrderGroup? menuOrderGroupDb = _printOrderGroupRepo.GetById(menuPrintOrder.Id);
+                                    menuOrderGroupDb = _printOrderGroupRepo.GetById(menuPrintOrder.Id.Value);
                                     if (menuOrderGroupDb != null)
                                     {
-                                        DTO.Responses.PrintOrder menuPO = new()
-                                        {
-                                            Id = menuOrderGroupDb.Id,
-                                            Name = menuOrderGroupDb.Name
-                                        };
-                                        foreach (DTO.Requests.Article menuItem in menuPrintOrder.ArticleList)
-                                        {
-                                            OrderLineNo++;
-                                            Article? menuItemDb = _articleRepo.GetById(menuItem.Id);
-                                            if (menuItemDb != null)
-                                            {
-                                                DTO.Responses.Article menuItemRes = new()
-                                                {
-                                                    Id = menuItemDb.Id,
-                                                    OrderLineNo = OrderLineNo,
-                                                    Name = menuItemDb.Name,
-                                                    Units = menuItem.Units,
-                                                    ModifList = menuItem.ModifList,
-                                                    StateId = _stateRepo.GetAll().OrderBy(state => state.Order).First().Id
-                                                };
-                                                OrderItem menuOrderItem = new()
-                                                {
-                                                    OrderId = dbOrder.Id,
-                                                    OrderLineNo = OrderLineNo,
-                                                    Units = menuItem.Units,
-                                                    ModifList = String.Join(",", menuItem.ModifList),
-                                                    MenuOrderLineNo = orderItem.OrderLineNo,
-                                                    PrintOrderGroup = orderGroupDb,
-                                                    Article = menuItemDb,
-                                                    State = _stateRepo.GetAll().OrderBy(state => state.Order).First()
-                                                };
-                                                menuOrderItem = _orderItemRepo.Save(menuOrderItem);
-                                                if (menuItemDb.Monitors.Count > 0)
-                                                {
-                                                    foreach (DAL.Models.Monitor monitor in menuItemDb.Monitors)
-                                                    {
-                                                        menuItemRes.MonitorList.Add((uint)monitor.Id);
-                                                    }
-                                                }
-                                                else if(menuItemDb.Department.Monitors.Count > 0)
-                                                {
-                                                    foreach (DAL.Models.Monitor monitor in menuItemDb.Department.Monitors)
-                                                    {
-                                                        menuItemRes.MonitorList.Add((uint)monitor.Id);
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    foreach (DAL.Models.Monitor monitor in menuItemDb.Department.Family.Monitors)
-                                                    {
-                                                        menuItemRes.MonitorList.Add((uint)monitor.Id);
-                                                    }
-                                                }
-                                                menuPO.ArticleList.Add(menuItemRes);
-                                            }
-                                            else
-                                            {
+                                        menuPO.Id = menuOrderGroupDb.Id;
+                                        menuPO.Name = menuOrderGroupDb.Name;
+                                    }
+                                }
+                                 
+                                    
+                                foreach (DTO.Requests.Article menuItem in menuPrintOrder.ArticleList)
+                                {
 
+                                    OrderLineNo++;
+                                    Article? menuItemDb = _articleRepo.GetById(menuItem.Id);
+                                    if (menuItemDb != null)
+                                    {
+                                        DTO.Responses.Article menuItemRes = new()
+                                        {
+                                            Id = menuItemDb.Id,
+                                            OrderLineNo = OrderLineNo,
+                                            Name = menuItemDb.Name,
+                                            Units = menuItem.Units,
+                                            ModifList = menuItem.ModifList,
+                                            StateId = _stateRepo.GetAll().OrderBy(state => state.Order).First().Id
+                                        };
+                                        OrderItem menuOrderItem = new()
+                                        {
+                                            OrderId = dbOrder.Id,
+                                            OrderLineNo = OrderLineNo,
+                                            Units = menuItem.Units,
+                                            ModifList = String.Join(",", menuItem.ModifList),
+                                            MenuOrderLineNo = orderItem.OrderLineNo,
+                                            PrintOrderGroup = orderGroupDb,
+                                            Article = menuItemDb,
+                                            State = _stateRepo.GetAll().OrderBy(state => state.Order).First()
+                                        };
+                                        menuOrderItem = _orderItemRepo.Save(menuOrderItem);
+                                        if (menuItemDb.Monitors.Count > 0)
+                                        {
+                                            foreach (DAL.Models.Monitor monitor in menuItemDb.Monitors)
+                                            {
+                                                menuItemRes.MonitorList.Add((uint)monitor.Id);
                                             }
-                                            
-                                            
                                         }
-                                        a.Menu.printOrderlist.Add(menuPO);
+                                        else if(menuItemDb.Department.Monitors.Count > 0)
+                                        {
+                                            foreach (DAL.Models.Monitor monitor in menuItemDb.Department.Monitors)
+                                            {
+                                                menuItemRes.MonitorList.Add((uint)monitor.Id);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            foreach (DAL.Models.Monitor monitor in menuItemDb.Department.Family.Monitors)
+                                            {
+                                                menuItemRes.MonitorList.Add((uint)monitor.Id);
+                                            }
+                                        }
+                                        menuPO.ArticleList.Add(menuItemRes);
                                     }
                                     else
                                     {
 
                                     }
+                                            
+                                            
                                 }
+                                a.Menu.printOrderlist.Add(menuPO);
+                                
                             }
+                        }
                             
-                            po.ArticleList.Add(a);
-                        }
-                        else
-                        {
-
-                        }
+                        po.ArticleList.Add(a);
                     }
-                    kitchenOrder.PrintOrderList.Add(po);
-                }
-                else
-                {
+                    else
+                    {
 
+                    }
                 }
+                kitchenOrder.PrintOrderList.Add(po);
+                
             }
 
             Console.WriteLine(_stateRepo.GetAll().OrderBy(s=> s.Order).First().Id);
