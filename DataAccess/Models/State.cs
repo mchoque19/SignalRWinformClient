@@ -1,30 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Metadata;
-using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DAL.Models;
-
-[Table("State")]
-public partial class State
+namespace DAL.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class State
+    {
+        private int id;
+        private string name;
+        private int order;
+        private string color;
+        private bool marchando;
 
-    public string Name { get; set; } = null!;
+        public int Id { get => id; set => id = value; }
+        public string Name { get => name; set => name = value; }
+        public int Order { get => order; set => order = value; }
+        public string Color { get => color; set => color = value; }
+        public bool Marchando { get => marchando; set => marchando = value; }
 
-    public int Order { get; set; }
 
-    public string Color { get; set; }
+        public virtual ICollection<Monitor> Monitors { get; set; }
+        public virtual ICollection<OrderItem> OrderItems { get; set; }
 
-    public bool Marchando { get; set; }
-
-    [InverseProperty("State")]
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
-    [ForeignKey("StatesId")]
-    [InverseProperty("States")]
-    public virtual ICollection<Monitor> Monitors { get; set; } = new List<Monitor>();
+        //public int Id { get; set; }
+        //public string Name { get; set; }
+        //public int Order { get; set; }
+        //public string Color { get; set; }
+        //public bool Marchando { get; set; }
+    }
 }

@@ -1,21 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DAL.Models
 {
-	[Table("Device")]
-	public partial class Device
+    public class Device
     {
-		[Key]
-		public int Id { get; set; }
-		public string Name { get; set; } = null!;
-		public string Mac { get; set; } = null!;
-		public string Ip { get; set; } = null!;
-		public string Version { get; set; } = null!;
-		public DateTime Date { get; set; } = DateTime.Now;
-		public bool Active { get; set; } = false;
-	}
+        private int id;
+        private string name;
+        private string mac;
+        private string ip;
+        private string version;
+        private bool active;
+        private DateTime date;
+
+
+        public int Id { get => id; set => id = value; }
+        public string Name { get => name; set => name = value; }
+        public string Mac { get => mac; set => mac = value; }
+        public string Ip { get => ip; set => ip = value; }
+        public string Version { get => version; set => version = value; }
+        public bool Active { get => active; set => active = value; }
+        public DateTime Date { get => date; set => date = value; }
+    }
 }

@@ -1,45 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
-namespace DAL.Models;
-
-[PrimaryKey("OrderId", "OrderLineNo")]
-[Table("OrderItem")]
-[Index("ArticleId", Name = "IX_OrderItem_ArticleId")]
-[Index("PrintOrderGroupId", Name = "IX_OrderItem_PrintOrderGroupId")]
-[Index("StateId", Name = "IX_OrderItem_StateId")]
-public partial class OrderItem
+namespace DAL.Models
 {
-    [Key]
-    public int OrderId { get; set; }
+    public class OrderItem
+    {
+        private int orderId;
+        private int orderLineNo;
+        private float units;
+        private string modifList;
+        private int? menuOrderLineNo;
 
-    [Key]
-    public int OrderLineNo { get; set; }
 
-    public int? PrintOrderGroupId { get; set; }
+        public int OrderId { get => orderId; set => orderId = value; }
+        public int OrderLineNo { get => orderLineNo; set => orderLineNo = value; }
+        public float Units { get => units; set => units = value; }
+        public string ModifList { get => modifList; set => modifList = value; }
+        public int? MenuOrderLineNo { get => menuOrderLineNo; set => menuOrderLineNo = value; }
 
-    public int ArticleId { get; set; }
 
-    public int Units { get; set; }
+        public virtual PrintOrderGroup? PrintOrderGroup { get; set; }
+        public virtual Article Article { get; set; }
+        public virtual State State { get; set; }
+        public virtual Order Order { get; set; }
 
-    public string ModifList { get; set; } = null!;
-
-    public int? MenuOrderLineNo { get; set; }
-
-    public int StateId { get; set; }
-
-    [ForeignKey("ArticleId")]
-    [InverseProperty("OrderItems")]
-    public virtual Article Article { get; set; } = null!;
-
-    [ForeignKey("PrintOrderGroupId")]
-    [InverseProperty("OrderItems")]
-    public virtual PrintOrder? PrintOrderGroup { get; set; }
-
-    [ForeignKey("StateId")]
-    [InverseProperty("OrderItems")]
-    public virtual State State { get; set; } = null!;
+    }
 }

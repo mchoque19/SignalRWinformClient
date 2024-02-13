@@ -10,11 +10,12 @@
         public int Id { get; set; }
         public int OrderLineNo { get; set; }
         public string Name { get; set; }
-        public int Units { get; set; }
+        public float Units { get; set; }
+        public int PeparationTime { get; set; }
         public List<uint> MonitorList { get; set; }
         public List<string> ModifList { get; set; }
         public Menu? Menu { get; set; }
-        public int StateId { get; set; } = 1;
+        public int StateId { get; set; }
 
         public override string ToString()
         {

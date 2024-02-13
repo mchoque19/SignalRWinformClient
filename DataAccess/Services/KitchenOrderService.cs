@@ -1,4 +1,4 @@
-﻿using DAL.DAO;
+﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace DAL.Services
         {
             _context = context;
         }
-        public void save(Dictionary<string,dynamic> order)
+        public long save(Dictionary<string,dynamic> order)
         {
             Order orderdb = new()
             {
@@ -23,7 +23,7 @@ namespace DAL.Services
                 MadiCustNo = order["MadiCustNo"],
                 CompNo = order["CompNo"],
                 StoreNo = order["StoreNo"],
-                OrderId = order["OrderId"],
+                TransNo = order["OrderId"],
                 TermNo = order["TermNo"],
                 OperNo = order["OperNo"],
                 OperName = order["OperName"],
@@ -42,9 +42,17 @@ namespace DAL.Services
                 populateOrderItem(po, orderdb.Id, null);
             
             }
-            
+            Console.WriteLine("--------");
+            Console.WriteLine(orderdb.Id);
+            Console.WriteLine("--------");
+
+            return orderdb.Id;
         }
 
+        public Order? GetOrderById(long orderId)
+        {
+            return _context.Order.Where(x => x.Id == orderId).FirstOrDefault();
+        }
         private void populateOrderItem(Dictionary<string,dynamic> printOrder, int orderId, int? MenuOrderLine)
         {
             

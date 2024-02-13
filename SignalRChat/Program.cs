@@ -2,14 +2,15 @@ using Microsoft.AspNet.SignalR;
 using SignalRChat.Hubs;
 using DAL;
 using Microsoft.EntityFrameworkCore;
-using DAL.Services;
-using DAL.DAO;
+using DAL.Repositories;
 using DAL.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 //using Microsoft.Owin.Security.OAuth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SignalRChat.Services;
+using DAL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +20,24 @@ builder.Services.AddSignalR();
 builder.Services.AddDbContext<KitchenServerDbContext>(opts=> opts.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
     //b => b.MigrationsAssembly("SignalRWinformClient.DAL")
     ));
-builder.Services.AddScoped<KitchenOrderService>();
-builder.Services.AddScoped<ArticleService>();
+//builder.Services.AddScoped<KitchenOrderService>();
+//builder.Services.AddScoped<ArticleService>();
+//builder.Services.AddScoped<DAL.Services.OrderItemService>();
+//builder.Services.AddSingleton<OrderService>();
+
+
+builder.Services.AddScoped<IGenericCRUD<Article>, ArticleRepository>();
+builder.Services.AddScoped<IGenericCRUD<Department>, DepartmentRepository>();
+builder.Services.AddScoped<IGenericCRUD<Family>, FamilyRepository>();
+builder.Services.AddScoped<IGenericCRUD<DAL.Models.Monitor>, MonitorRepository>();
+builder.Services.AddScoped<IGenericCRUD<OrderItem>, OrderItemRepository>();
+builder.Services.AddScoped<IGenericCRUD<Order>, OrderRepository>();
+builder.Services.AddScoped<IGenericCRUD<PrintOrderGroup>, PrintOrderGroupRepository>();
+builder.Services.AddScoped<IGenericCRUD<State>, StateRepository>();
+builder.Services.AddScoped<OrderItemRepository>();
+builder.Services.AddScoped<OrderRepository>();
+builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<OrderItemService>();
-
-
-builder.Services.AddScoped<IService<PrintOrderGroup>, PrintOrderGroupService>();
 
 //inicio prueba
 builder.Services.AddAuthentication(options =>
@@ -63,7 +76,7 @@ builder.Services.AddAuthentication(options =>
 		OnMessageReceived = context =>
 		{
 			var accessToken = context.Request.Query["access_token"];
-			Console.WriteLine("#########3");
+			Console.WriteLine("##########");
 			Console.WriteLine(accessToken);
 			// If the request is for our hub...
 			var path = context.HttpContext.Request.Path;
@@ -84,6 +97,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<KitchenServerDbContext>();
+	//context.Database.EnsureCreated();
     context.Database.Migrate();
 }
 

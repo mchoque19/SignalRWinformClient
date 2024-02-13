@@ -1,166 +1,53 @@
-﻿
-using Microsoft.AspNetCore.SignalR;
-using DAL.Services;
-using DAL.DAO;
-using System.Drawing.Text;
-using SignalRChat.DTO.Requests;
-using SignalRChat.DTO;
-using NuGet.Protocol;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
+using DAL.Models;
+using SignalRChat.Services;
+using DAL.Repositories;
+using SignalRChat.DTO;
+
 
 namespace SignalRChat.Hubs
 {
 	[Authorize]
 	public class ChatHub: Hub
     {
-        private readonly KitchenOrderService _orderService;
-        private readonly IService<PrintOrderGroup> _printOrderGroupService;
-        private readonly ArticleService _articleService;
+        private readonly OrderService _orderService;
         private readonly OrderItemService _orderItemService;
+        private readonly OrderRepository _orderRepo;
+        private readonly IGenericCRUD<State> _stateRepo;
+        private readonly IGenericCRUD<PrintOrderGroup> _printOrderRepo;
+        //private readonly IService<PrintOrderGroup> _printOrderGroupService;
+        //private readonly ArticleService _articleRepo;
+        //private readonly OrderItemService _orderItemService;
 
-        public ChatHub(KitchenOrderService orderService, IService<PrintOrderGroup> printOrderGroupService, ArticleService articleService, OrderItemService orderItemService)
+
+        //private readonly IGenericCRUD<Order> _orderRepo;
+
+        public ChatHub(OrderService orderService, OrderItemService orderItemService, OrderRepository orderRepo, IGenericCRUD<State> stateRepo, IGenericCRUD<PrintOrderGroup> printOrderRepo)
         {
             _orderService = orderService;
-            _printOrderGroupService = printOrderGroupService;
-            _articleService = articleService;
             _orderItemService = orderItemService;
+            _orderRepo = orderRepo;
+            _stateRepo = stateRepo;
+            _printOrderRepo = printOrderRepo;
         }
 
-        public async Task KitchenOrder(DTO.Requests.KitchenOrder json)
+        public async Task KitchenOrder(/*Dictionary<string, dynamic> json)*/ DTO.Requests.KitchenOrder json)
         {
             Console.WriteLine(json);
-            int OrderLineNo = 0;
-            DTO.Responses.KitchenOrder response = new()
-            {
-                CompNo = json.CompNo,
-                SoftwareVers = json.SoftwareVers,
-                MadiCustNo = json.MadiCustNo,
-                StoreNo = json.StoreNo,
-                OperNo = json.OperNo,
-                OrderId = json.OrderId,
-                StartTime = json.StartTime,
-                OperName = json.OperName,
-                TermNo = json.TermNo,
-                Pax = json.Pax,
-                TbNum = json.TbNum,
-                TableType = json.TableType,
-                RefOrderId = json.RefOrderId
-            };
-            foreach (var p in json.PrintOrderList)
-            {
-                PrintOrderGroup? orderGroup = _printOrderGroupService.GetById(p.Id);
-                DTO.Responses.PrintOrder print = new DTO.Responses.PrintOrder();
-                
-                print.Id =  orderGroup?.Id ?? null ;
-                print.Name = orderGroup?.Name ?? null;
-                foreach (var a in p.ArticleList)
-                {
-                    OrderLineNo++;
-                    DAL.DAO.Article? articleDB = _articleService.GetById(a.Id);
-                    //DTO.Responses.Article resArticle = a.toResponse(articleDB);
-                    DTO.Responses.Article resArticle = new()
-                    {
-                        // TODO: Que pasa si el articulo no se encuentra? (el articulo no esta cargado)
-                        Id = articleDB.Id,
-                        OrderLineNo = OrderLineNo,
-                        Name = articleDB?.Name,
-                        Units = a.Units,
-                        ModifList = a.ModifList
-                    };
-                    if (a.Menu == null)
-                    {
+            DTO.Responses.KitchenOrder response = _orderService.New(json);
 
-                        if (articleDB.Monitors.Count > 0)
-                        {
-                            foreach (var monitor in articleDB.Monitors)
-                            {
-                                resArticle.MonitorList.Add((uint)monitor.Id);
-                            }
-                        }
-                        else if (articleDB.Department.Monitors.Count > 0)
-                        {
-                            foreach (var monitor in articleDB.Department.Monitors)
-                            {
-                                resArticle.MonitorList.Add((uint)monitor.Id);
-                            }
-                        }
-                        else
-                        {
-                            foreach (var monitor in articleDB.Department.Family.Monitors)
-                            {
-                                resArticle.MonitorList.Add((uint)monitor.Id);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        resArticle.Menu = new()
-                        {
-                            Name = a.Menu.Name
-                        };
-                        foreach (var PrintOrder in a.Menu.printOrderList)
-                        {
-                            PrintOrderGroup? printOrderDb = _printOrderGroupService.GetById(PrintOrder.Id);
-                            DTO.Responses.PrintOrder mPrintOrder = new()
-                            {
-                                Id = printOrderDb.Id,
-                                Name = printOrderDb.Name
-                            };
-                            foreach (var menuItem in PrintOrder.ArticleList)
-                            {
-                                OrderLineNo++;
-                                DAL.DAO.Article? articleDb = _articleService.GetById(menuItem.Id);
-                                DTO.Responses.Article article = new()
-                                {
-                                    Id = articleDb.Id,
-                                    OrderLineNo = OrderLineNo,
-                                    Name = articleDb.Name,
-                                    Units = menuItem.Units,
-                                    ModifList = menuItem.ModifList
-                                };
-                                if (articleDb.Monitors.Count > 0)
-                                {
-                                    foreach (var monitor in articleDb.Monitors)
-                                    {
-                                        article.MonitorList.Add((uint)monitor.Id);
-                                    }
-                                }
-                                else if (articleDb.Department.Monitors.Count > 0)
-                                {
-                                    foreach (var monitor in articleDb.Department.Monitors)
-                                    {
-                                        article.MonitorList.Add((uint)monitor.Id);
-                                    }
-                                }
-                                else
-                                {
-                                    foreach (var monitor in articleDb.Department.Family.Monitors)
-                                    {
-                                        article.MonitorList.Add((uint)monitor.Id);
-                                        resArticle.MonitorList.Add((uint)monitor.Id);
-                                    }
-                                }
-                                mPrintOrder.ArticleList.Add(article);
-                            }
-                            resArticle.Menu.printOrderlist.Add(mPrintOrder);
-                        }
-                    }
-                    print.ArticleList.Add(resArticle);
-                }
-                response.PrintOrderList.Add(print);
-            }
-            
-            _orderService.save(response.ToDictionary());
             Console.WriteLine(response.ToString());
-            
             await Clients.All.SendAsync("KitchenOrder", response);
         }
 
-        public async Task ChangeStatus(ChangeStatus json)
+        public async Task ChangeStatus(DTO.ChangeStatus json)
         {
             // TODO: comprobar que el OldStatus coincide con el de BBDD y hacer el cambio
-            _orderItemService.ChangeStatus(json.ToDictionary());
-            if (_orderItemService.IsOrderFinished(json.OrderId, json.TermNo))
+            Console.WriteLine("Cambio de estado");
+            _orderItemService.ChangeStatus(json);
+            await Clients.All.SendAsync("ChangeStatus", json);
+            if (_orderService.IsOrderFinished(json.OrderId))
             {
                 DTO.Responses.CloseTable closeTableDto = new()
                 {
@@ -168,16 +55,57 @@ namespace SignalRChat.Hubs
                 };
                 await Clients.All.SendAsync("CloseTable", closeTableDto);
             }
-            await Clients.All.SendAsync("ChangeStatus", json);
         }
 
-        public async Task CloseTable(DTO.Requests.CloseTable json)
+
+        public async Task Marchando(DTO.Requests.Marhcando json)
         {
-            if (_orderItemService.IsOrderFinished(json.OrderId, json.TermNo))
+            PrintOrderGroup printOrderGroup = _printOrderRepo.GetById(json.PrintOrderId);
+            Order? orderDb = _orderRepo.Find(json.SoftwareVers, json.MadiCustNo, json.CompNo, json.StoreNo, json.TermNo, json.TransNo);
+            State state = _stateRepo.GetAll().Where(s => s.Marchando).First();
+            if (orderDb != null)
             {
-                await Clients.All.SendAsync("CloseTable", json);
+                DTO.ChangeStatus changeStatus = new()
+                {
+                    SoftwareVers = orderDb.SoftwareVers,
+                    MadiCustNo = orderDb.MadiCustNo,
+                    CompNo = orderDb.CompNo,
+                    StoreNo = orderDb.StoreNo,
+                    TermNo = orderDb.TermNo,
+                    OrderId = orderDb.Id,
+                    DateTime = DateTime.Now.ToString("u"),
+                    ChangeList = new List<Change>()
+                        
+                };
+
+                List<OrderItem> items = orderDb.OrderItems.Where(oi => oi.PrintOrderGroup == printOrderGroup).ToList();
+                foreach(OrderItem orderItem in items)
+                {
+                    Change change = new()
+                    {
+                        OrderLineNo = orderItem.OrderLineNo,
+                        OldState = orderItem.State.Id,
+                        NewState = state.Id,
+                    };
+                    changeStatus.ChangeList.Add(change);
+                }
+                _orderItemService.ChangeStatus(changeStatus);
             }
+            else
+            {
+
+            }
+            await Clients.All.SendAsync("ChangeStatus", changeStatus);
+
         }
+
+        //public async Task CloseTable(DTO.Requests.CloseTable json)
+        //{
+        //    if (_orderItemService.IsOrderFinished(json.OrderId, json.TermNo))
+        //    {
+        //        await Clients.All.SendAsync("CloseTable", json);
+        //    }
+        //}
 
     }
 }

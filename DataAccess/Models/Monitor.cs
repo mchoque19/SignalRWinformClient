@@ -1,32 +1,27 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DAL.Models;
-
-[Table("Monitor")]
-public partial class Monitor
+namespace DAL.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class Monitor
+    {
+        private int id;
+        private string name;
 
-    public string Name { get; set; } = null!;
 
-    [ForeignKey("MonitorsId")]
-    [InverseProperty("Monitors")]
-    public virtual ICollection<Article> Articles { get; set; } = new List<Article>();
+        public int Id { get => id; set => id = value; }
+        public string Name { get => name; set => name = value; }
 
-    [ForeignKey("MonitorsId")]
-    [InverseProperty("Monitors")]
-    public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
 
-    [ForeignKey("MonitorsId")]
-    [InverseProperty("Monitors")]
-    public virtual ICollection<Family> Families { get; set; } = new List<Family>();
+        public virtual ICollection<Family> Families { get; set; }
+        public virtual ICollection<Department> Departments { get; set; }
+        public virtual ICollection<Article> Articles { get; set; }
+        public virtual ICollection<State> States { get; set; }
 
-    [ForeignKey("MonitorsId")]
-    [InverseProperty("Monitors")]
-    public virtual ICollection<State> States { get; set; } = new List<State>();
+    }
 }

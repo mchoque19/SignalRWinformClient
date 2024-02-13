@@ -1,5 +1,5 @@
-﻿using DAL.DAO;
-using DAL.Interfaces;
+﻿using DAL.Interfaces;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ namespace DAL.Services
 
         }
 
-        public bool addStatInMonitorn(DAO.Monitor monitor, int stateId)
+        public bool addStatInMonitorn(Models.Monitor monitor, int stateId)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace DAL.Services
             return Save();
         }
 
-        public bool deleteMonitorStatus(DAO.Monitor monitor, int stateId)
+        public bool deleteMonitorStatus(Models.Monitor monitor, int stateId)
         {
             State state = _context.State
                                .Where(p => p.Id == stateId)

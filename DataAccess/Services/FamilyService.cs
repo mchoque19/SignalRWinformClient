@@ -1,5 +1,5 @@
-﻿using DAL.DAO;
-using DAL.Interfaces;
+﻿using DAL.Interfaces;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Services
@@ -58,28 +58,6 @@ namespace DAL.Services
         public bool Update(Family family)
         {
             _context.Update(family);
-            return Save();
-        }
-
-        public bool addFamilyInMonitor(DAO.Monitor monitor, int familyId)
-        {
-            try
-            {
-                Family family = _context.Family
-                         .Where(p => p.Id == familyId)
-                         .First();
-
-                monitor.Families.Add(family);
-                foreach(var item in family.Departments)
-                {
-                    monitor.Departments.Add(item);
-                }                                
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error al guardar familia en monitor");
-            }
             return Save();
         }
     }

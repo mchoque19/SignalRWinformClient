@@ -8,7 +8,7 @@
         }
 
         public string SoftwareVers { get; set; }
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
         public int MadiCustNo { get; set; }
         public int CompNo { get; set; }
         public int StoreNo { get; set; }
@@ -16,10 +16,10 @@
         public int OperNo { get; set; }
         public string OperName { get; set; }
         public string StartTime { get; set; }
-        public string TbNum { get; set; }
+        public String TbNum { get; set; }
         public int Pax { get; set; }
         public string TableType { get; set; }
-        public string? RefOrderId { get; set; }
+        //public string? RefOrderId { get; set; }
         public List<PrintOrder> PrintOrderList { get; set; }
 
         public override string ToString()
@@ -36,7 +36,7 @@
                 $"\"TbNum\":  \"{this.TbNum} \"," +
                 $"\"Pax\": {this.Pax}," +
                 $"\"TableType\":  \"{this.TableType} \"," +
-                $"\"RefOrderId\": {this.RefOrderId?? "null"}," +
+                //$"\"RefOrderId\": {this.RefOrderId?? "null"}," +
                 $"\"PrintOrderList\": [{String.Join(",", this.PrintOrderList)}]" +
                 "}";
 
@@ -57,7 +57,7 @@
                 ["TbNum"] = TbNum,
                 ["Pax"] = Pax,
                 ["TableType"] = TableType,
-                ["RefOrderId"] = RefOrderId,
+                //["RefOrderId"] = RefOrderId,
                 ["PrintOrderList"] = new List<Dictionary<string, dynamic>>()
             };
 

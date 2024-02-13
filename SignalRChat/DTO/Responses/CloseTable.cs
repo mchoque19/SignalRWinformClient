@@ -2,6 +2,6 @@
 {
     public class CloseTable
     {
-        public string OrderId { get; set; }
+        public long OrderId { get; set; }
     }
 }

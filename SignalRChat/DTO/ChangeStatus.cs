@@ -1,5 +1,4 @@
-﻿using DAL.DAO;
-using Microsoft.Identity.Client.Extensions.Msal;
+﻿using Microsoft.Identity.Client.Extensions.Msal;
 using System.Threading.Channels;
 
 namespace SignalRChat.DTO
@@ -13,8 +12,8 @@ namespace SignalRChat.DTO
         public int TermNo { get; set; }
         public int OperNo { get; set; }
         public string OperName { get; set; }
-        public string DateTime { get; set; }
-        public string OrderId { get; set; }
+        public string? DateTime { get; set; }
+        public int OrderId { get; set; }
         public List<Change> ChangeList { get; set; }
 
         public Dictionary<string, dynamic> ToDictionary()

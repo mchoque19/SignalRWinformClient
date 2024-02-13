@@ -1,5 +1,6 @@
-﻿using DAL.DAO;
+﻿using DAL.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 
 namespace DAL
@@ -16,14 +17,14 @@ namespace DAL
         public DbSet<PrintOrderGroup> PrintOrder { get; set; }
         public DbSet<Article> Article { get; set; }
         public DbSet<State> State { get; set; }
-        public DbSet<DAO.Monitor> Monitor { get; set; }
+        public DbSet<Models.Monitor> Monitor { get; set; }
         public DbSet<Family> Family { get; set; }
         public DbSet<Department> Department { get; set; }
 		public DbSet<Device> Device { get; set; }
-		public DbSet<User> User { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<OrderItem>().ToTable("OrderItem").HasKey(o => new { o.OrderId,  o.OrderLineNo });
+            modelBuilder.Entity<OrderItem>().HasKey(o => new { o.OrderId,  o.OrderLineNo });
+            modelBuilder.Entity<OrderItem>().HasOne<Order>(oi => oi.Order).WithMany(order => order.OrderItems).HasForeignKey(oi => oi.OrderId);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using DAL;
-using DAL.DAO;
+using DAL.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

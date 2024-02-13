@@ -1,5 +1,5 @@
-﻿using DAL.DAO;
-using DAL.Interfaces;
+﻿using DAL.Interfaces;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Services
 {
-    public class MonitorService : IGenericRepository<DAO.Monitor>
+    public class MonitorService : IGenericRepository<Models.Monitor>
     {
         private readonly KitchenServerDbContext _context;
 
@@ -19,23 +19,23 @@ namespace DAL.Services
             _context = context;
         }
        
-        public bool Delete(DAO.Monitor monitor)
+        public bool Delete(Models.Monitor monitor)
         {
             _context.Remove(monitor);
             return Save();
         }
 
-        public async Task<IEnumerable<DAO.Monitor>> GetAll()
+        public async Task<IEnumerable<Models.Monitor>> GetAll()
         {
             return await _context.Monitor.ToListAsync();
         }
 
-        public async Task<DAO.Monitor> GetByIdAsync(int id)
+        public async Task<Models.Monitor> GetByIdAsync(int id)
         {
             return await _context.Monitor.FirstAsync(i => i.Id == id);
         }
 
-        public bool Insert(DAO.Monitor monitor)
+        public bool Insert(Models.Monitor monitor)
         {
             _context.Add(monitor);
             return Save();
@@ -47,13 +47,13 @@ namespace DAL.Services
             return saved > 0 ? true : false;
         }
 
-        public bool Update(DAO.Monitor monitor)
+        public bool Update(Models.Monitor monitor)
         {    
            _context.Update(monitor);
             return Save();
         }
 
-        public bool InsertArticleInMonitor(DAO.Monitor monitor, int articleId)
+        public bool InsertArticleInMonitor(Models.Monitor monitor, int articleId)
         {
             Article article = _context.Article
                          .Where(p => p.Id == articleId)
@@ -61,7 +61,7 @@ namespace DAL.Services
             monitor.Articles.Add(article);
             return Save();
         }
-        public bool DeleteArticleOfMonitor(DAO.Monitor monitor, int articleId)
+        public bool DeleteArticleOfMonitor(Models.Monitor monitor, int articleId)
         {
             Article article = _context.Article
                          .Where(p => p.Id == articleId)

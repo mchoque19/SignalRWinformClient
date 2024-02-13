@@ -1,30 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-
-namespace DAL.Models;
-
-[Table("Article")]
-[Index("DepartmentId", Name = "IX_Article_DepartmentId")]
-public partial class Article
+﻿namespace DAL.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class Article
+    {
+        private int id;
+        private string name;
+        private int preparationTime;
 
-    public string Name { get; set; } = null!;
 
-    public int DepartmentId { get; set; }
+        public int Id { get => id; set => id = value; }
+        public string Name { get => name; set => name = value; }
+        public int PreparationTime { get => preparationTime; set => preparationTime = value; }
 
-    [ForeignKey("DepartmentId")]
-    [InverseProperty("Articles")]
-    public virtual Department Department { get; set; } = null!;
 
-    [InverseProperty("Article")]
-    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
-    [ForeignKey("ArticlesId")]
-    [InverseProperty("Articles")]
-    public virtual ICollection<Monitor> Monitors { get; set; } = new List<Monitor>();
+        public virtual ICollection<Monitor> Monitors { get; set; }
+        public virtual Department Department { get; set; }
+        public virtual ICollection<OrderItem> OrderItems { get; set; }
+    }
 }

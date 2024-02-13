@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DAL.Models;
-
-[Table("Family")]
-public partial class Family
+namespace DAL.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class Family
+    {
+        private int id;
+        private string name;
 
-    public string Name { get; set; } = null!;
 
-    [InverseProperty("Family")]
-    public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
+        public int Id { get => id; set => id = value; }
+        public string Name { get => name; set => name = value; }
 
-    [ForeignKey("FamiliesId")]
-    [InverseProperty("Families")]
-    public virtual ICollection<Monitor> Monitors { get; set; } = new List<Monitor>();
+
+        public virtual ICollection<Monitor> Monitors { get; set; }
+        public virtual ICollection<Department> Departments { get; set; }
+    }
 }

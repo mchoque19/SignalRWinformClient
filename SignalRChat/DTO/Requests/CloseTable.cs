@@ -10,6 +10,6 @@
         public int OperNo { get; set; }
         public string OperName { get; set; }
         public string DateTime { get; set; }
-        public string OrderId { get; set; }
+        public long OrderId { get; set; }
     }
 }

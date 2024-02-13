@@ -1,5 +1,5 @@
-﻿using DAL.DAO;
-using DAL.Interfaces;
+﻿using DAL.Interfaces;
+using DAL.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -50,20 +50,7 @@ namespace DAL.Services
         public bool Update(Department department)
         {
             _context.Update(department);
-            return Save(); throw new NotImplementedException();
+            return Save();
         }
-        ////obtener los departamentos con la familia
-        public async Task<Department> GetAllArticlesByDepartment(int id)
-        {
-            return await _context.Department.Include(d => d.Articles).FirstAsync(d => d.Id == id);
-            //return await _context.Article.Where(b => b.Id == id).ToListAsync();
-            //_context.Department
-            //       .Where(b => b.Id == id)
-            //       .Include(b => b.Articles)
-            //       .ToListAsync();                                 
-        }
-
-       
-
     }
 }
