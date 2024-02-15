@@ -1,6 +1,6 @@
 ﻿namespace SignalRChat.DTO.Requests
 {
-    public class Marhcando
+    public class FireOrder
     {
         public string SoftwareVers { get; set; }
         public int MadiCustNo { get; set; }

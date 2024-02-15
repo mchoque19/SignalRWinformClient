@@ -40,7 +40,28 @@ namespace SignalRChat.DTO
         }
 
 
+        public String ToString()
+        {
+            string dict =  "{" +
+                    $"\"SofwareVers\":  \"{this.SoftwareVers}\"," +
+                    $"\"MadiCustNo\": {this.MadiCustNo}," +
+                    $"\"CompNo\": {this.CompNo}," +
+                    $"\"StoreNo\": {this.StoreNo}," +
+                    $"\"TermNo\": {this.TermNo}," +
+                    $"\"OperNo\": {this.OperNo}," +
+                    $"\"OperName\":  \"{this.OperName} \"," +
+                    $"\"TbNum\":  \"{this.OrderId} \"," +
+                    $"\"ChangeList\": [";
+
+            foreach( Change c in this.ChangeList)
+            {
+                dict += c.ToString();
+            }
+            dict += "]}";
+            return dict;
+        }
     }
+
 
     public class Change
     {
@@ -58,6 +79,15 @@ namespace SignalRChat.DTO
 
             };
             return dict;
+        }
+
+        public string ToString()
+        {
+            return "{" +
+                $"\"OrderLineNo\":  \"{this.OrderLineNo}\"," +
+                $"\"OldState\": {this.OldState}," +
+                $"\"NewState\": {this.NewState}," +
+                "}";
         }
     }
 }

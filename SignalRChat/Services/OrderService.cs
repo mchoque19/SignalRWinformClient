@@ -133,7 +133,7 @@ namespace SignalRChat.Services
                                 Name = article.Menu.Name
                             };
                                 
-                            foreach (DTO.Requests.PrintOrder menuPrintOrder in article.Menu.printOrderList)
+                            foreach (DTO.Requests.PrintOrder menuPrintOrder in article.Menu.PrintOrderList)
                             {
                                 PrintOrderGroup? menuOrderGroupDb = null;
                                 DTO.Responses.PrintOrder menuPO = new();

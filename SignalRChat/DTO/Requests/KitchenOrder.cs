@@ -10,6 +10,7 @@
         public int TermNo { get; set; }
         public int OperNo { get; set; }
         public string OperName { get; set; }
+        public int ProfCenNo { get; set; }
         public string? TbNum { get; set; }
         public int Pax { get; set; }
         public string TableType { get; set; }

@@ -48,7 +48,10 @@ namespace SignalRChat.Hubs
         {
             // TODO: comprobar que el OldStatus coincide con el de BBDD y hacer el cambio
             Console.WriteLine("Cambio de estado");
+            Console.WriteLine(json.ToString());
             _orderItemService.ChangeStatus(json);
+            Console.WriteLine("Enviando cambio de estado");
+
             await Clients.All.SendAsync("ChangeStatus", json);
             if (_orderService.IsOrderFinished(json.OrderId))
             {
@@ -56,12 +59,12 @@ namespace SignalRChat.Hubs
                 {
                     OrderId = json.OrderId,
                 };
+
                 await Clients.All.SendAsync("CloseTable", closeTableDto);
             }
         }
 
-
-        public async Task Marchando(DTO.Requests.Marhcando json)
+        public async Task FireOrder(DTO.Requests.FireOrder json)
         {
             PrintOrderGroup printOrderGroup = _printOrderRepo.GetById(json.PrintOrderId);
             Order? orderDb = _orderRepo.Find(json.SoftwareVers, json.MadiCustNo, json.CompNo, json.StoreNo, json.TermNo, json.TransNo);
@@ -138,7 +141,7 @@ namespace SignalRChat.Hubs
             foreach (DTO.Requests.Cancellation cancellation in json.VoidOrderKitchen)
             {
                 cancellation.TransferOperation = true;
-                Cancellation(cancellation);
+                VoidOrder(cancellation);
                 foreach(DTO.Requests.PrintOrder po in cancellation.PrintOrderList)
                 {
                     foreach(DTO.Requests.Article article in po.ArticleList)
@@ -151,7 +154,7 @@ namespace SignalRChat.Hubs
             KitchenOrder(newOrder);
         }
 
-        public async Task Cancellation(DTO.Requests.Cancellation json)
+        public async Task VoidOrder(DTO.Requests.Cancellation json)
         {
             Order? order = _orderRepo.Find(json.SoftwareVers, json.MadiCustNo, json.CompNo, json.StoreNo, json.TermNo, json.TransNo);
 
