@@ -1,6 +1,7 @@
 ﻿using DAL.Models;
 using DAL.Repositories;
 using Microsoft.IdentityModel.Tokens;
+using NuGet.Protocol;
 using SignalRChat.DTO;
 
 namespace SignalRChat.Services
@@ -59,6 +60,12 @@ namespace SignalRChat.Services
             }
         }
      
+        public OrderItem FindByArticleDescription(int orderId, int articleId, List<string> ModifList, int? printOrderId)
+        {
+            return _orderItemRepo.GetByArticleDescription(orderId, articleId, ModifList, printOrderId);
+        }
+
+       
     }
 
 }

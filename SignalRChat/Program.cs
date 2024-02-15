@@ -15,15 +15,9 @@ using DAL.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
-builder.Services.AddDbContext<KitchenServerDbContext>(opts=> opts.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
-    //b => b.MigrationsAssembly("SignalRWinformClient.DAL")
-    ));
-//builder.Services.AddScoped<KitchenOrderService>();
-//builder.Services.AddScoped<ArticleService>();
-//builder.Services.AddScoped<DAL.Services.OrderItemService>();
-//builder.Services.AddSingleton<OrderService>();
+builder.Services.AddDbContext<KitchenServerDbContext>(opts=> opts.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 
 builder.Services.AddScoped<IGenericCRUD<Article>, ArticleRepository>();
@@ -35,9 +29,11 @@ builder.Services.AddScoped<IGenericCRUD<Order>, OrderRepository>();
 builder.Services.AddScoped<IGenericCRUD<PrintOrderGroup>, PrintOrderGroupRepository>();
 builder.Services.AddScoped<IGenericCRUD<State>, StateRepository>();
 builder.Services.AddScoped<OrderItemRepository>();
+builder.Services.AddScoped<CancellationRepository>();
 builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<OrderItemService>();
+builder.Services.AddScoped<CancellationService>();
 
 //inicio prueba
 builder.Services.AddAuthentication(options =>

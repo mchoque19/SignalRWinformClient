@@ -14,7 +14,7 @@
         public int Pax { get; set; }
         public string TableType { get; set; }
         //public string? RefOrderId { get; set; }
-        public List<PrintOrder> PrintOrderList { get; set; }
+        public List<PrintOrder> PrintOrderList { get; set; } = new List<PrintOrder>();
 
         public override string ToString()
         {

@@ -69,5 +69,13 @@ namespace DAL.Repositories
         {
             return _context.OrderItem.Find(id, orderLineNo);
         }
+
+        public OrderItem? GetByArticleDescription(int orderId, int articleId, List<string> ModifList, int? printOrderId)
+        {
+            return _context.OrderItem.Where(item => item.OrderId == orderId
+                && item.Article.Id == articleId
+                && item.ModifList == String.Join(',',ModifList)
+                && item.PrintOrderGroup.Id == printOrderId).FirstOrDefault();
+        }
     }
 }

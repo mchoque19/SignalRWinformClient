@@ -25,6 +25,7 @@ namespace DAL.Models
         public virtual Article Article { get; set; }
         public virtual State State { get; set; }
         public virtual Order Order { get; set; }
+        public virtual ICollection<Cancellation> Cancellations { get; set; }
 
     }
 }
